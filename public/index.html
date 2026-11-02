@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#030805">
+<title>Vasco</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="toast" role="alert"></div>
+<div class="stage">
+<canvas id="orb" width="640" height="640" aria-hidden="true"></canvas>
+<h1 id="hd">Como posso ajudar-te hoje?</h1>
+<div id="log" class="show" aria-live="polite"></div>
+<div id="rp">
+<form class="add" id="fa"><input type="text" id="rt" placeholder="O que queres recordar?" required aria-label="Lembrete"><input type="datetime-local" id="rw" required aria-label="Quando"><button>Adicionar</button></form>
+<div id="list"></div>
+<p class="note" id="sy"></p>
+<button class="alt" id="nb" hidden>Ativar avisos no ecrã</button>
+</div>
+<form id="sp" autocomplete="off">
+<h2>API do assistente</h2>
+<label>Fornecedor
+<select id="sprov"><option value="anthropic">Anthropic (Claude)</option><option value="openai">Compatível com OpenAI (OpenAI, Ollama, LM Studio…)</option></select></label>
+<label id="surlrow" hidden>Endereço da API
+<input type="url" id="surl" placeholder="https://api.openai.com/v1" spellcheck="false"></label>
+<label>Modelo
+<input type="text" id="smod" list="smods" spellcheck="false"><datalist id="smods"></datalist></label>
+<label>Chave da API
+<input type="password" id="skey" autocomplete="new-password" spellcheck="false"></label>
+<p class="note" id="skeyinfo"></p>
+<div class="srow"><button class="alt" id="ssave">Guardar</button><button type="button" class="alt sec" id="stest">Testar</button><button type="button" class="alt sec" id="sclear" hidden>Apagar chave</button></div>
+<p class="note">A chave fica guardada só no servidor e nunca volta a ser mostrada.</p>
+</form>
+</div>
+<div class="dock">
+<div class="roles" id="roles">
+<button data-r="geral" aria-pressed="true">Geral</button>
+<button data-r="estudo" aria-pressed="false">Estudo</button>
+<button data-r="codigo" aria-pressed="false">Programação</button>
+<button data-r="criativo" aria-pressed="false">Criativo</button>
+<button data-r="lem" aria-pressed="false">Lembretes</button>
+<button data-r="cfg" aria-pressed="false">Definições</button>
+</div>
+<form class="row" id="f">
+<textarea id="q" rows="1" placeholder="Pergunta-me o que quiseres…" aria-label="Mensagem"></textarea>
+<button type="button" class="ib mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+<button class="ib" id="s" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg></button>
+</form>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
