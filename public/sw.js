@@ -1,5 +1,5 @@
 // Cache só do "esqueleto" da app; a API nunca é guardada em cache.
-const V = 'vasco-v3';
+const V = 'camoes-v6';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest', 'icon.svg',
   'js/main.js', 'js/util.js', 'js/api.js', 'js/orb.js', 'js/voice.js', 'js/reminders.js', 'js/ui.js', 'js/chat.js', 'js/settings.js',

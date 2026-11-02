@@ -46,7 +46,7 @@ function createServer({ config, store, assistant, settings }) {
 
   const authed = req => {
     if (!config.token) return true;
-    const got = Buffer.from(String(req.headers['x-vasco-token'] || ''));
+    const got = Buffer.from(String(req.headers['x-camoes-token'] || ''));
     const want = Buffer.from(config.token);
     return got.length === want.length && crypto.timingSafeEqual(got, want);
   };
@@ -75,7 +75,7 @@ function createServer({ config, store, assistant, settings }) {
         try {
           const text = await assistant.chat({ messages: [{ role: 'user', content: 'Responde só com a palavra: ok' }], role: 'geral', now: new Date().toISOString(), tzOffset: 0 });
           return send(res, 200, { ok: true, text: text.slice(0, 100) });
-        } catch (e) { return send(res, e.status === 429 ? 429 : 502, { error: modelError(e) }); }
+        } catch (e) { return send(res, e.status === 429 ? 429 : 502, { error: modelError(e), status: e.status, detail: e.detail }); }
       }
       if (!parts[2] && req.method === 'GET') return send(res, 200, settings.publicView());
       if (!parts[2] && req.method === 'PUT') {
@@ -106,7 +106,7 @@ function createServer({ config, store, assistant, settings }) {
         const text = await assistant.chat({ messages: b.messages, role: b.role, now: String(b.now || new Date().toISOString()).slice(0, 200), tzOffset: b.tzOffset });
         return send(res, 200, { text });
       } catch (e) {
-        return send(res, e.status === 429 ? 429 : 502, { error: modelError(e) });
+        return send(res, e.status === 429 ? 429 : 502, { error: modelError(e), status: e.status, detail: e.detail });
       }
     }
     send(res, 404, { error: 'nao encontrado' });

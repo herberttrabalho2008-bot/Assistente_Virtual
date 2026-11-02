@@ -9,7 +9,7 @@ const { createSettings } = require('../src/settings');
 const { createAssistant } = require('../src/assistant');
 const { createServer } = require('../src/http');
 
-const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'vasco-'));
+const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'camoes-'));
 const NOW = { role: 'geral', now: 'agora', tzOffset: 0 };
 
 test('settings: por omissão Anthropic, sem chave = não configurado', () => {
@@ -75,7 +75,7 @@ test('assistente (Anthropic): usa a chave e o modelo, e executa ferramentas', as
       ? ok({ stop_reason: 'tool_use', content: [{ type: 'tool_use', id: 't1', name: 'add_reminder', input: { text: 'pão', when: '2030-07-01T19:00' } }] })
       : ok({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'Feito.' }] });
   };
-  const { store, assistant } = setup({ ANTHROPIC_API_KEY: 'sk-ant', VASCO_MODEL: 'claude-x' }, fake);
+  const { store, assistant } = setup({ ANTHROPIC_API_KEY: 'sk-ant', CAMOES_MODEL: 'claude-x' }, fake);
   const text = await assistant.chat({ messages: [{ role: 'user', content: 'lembra-me do pão' }], ...NOW, tzOffset: -60 });
   assert.strictEqual(text, 'Feito.');
   assert.strictEqual(calls[0].url, 'https://api.anthropic.com/v1/messages');
@@ -168,4 +168,23 @@ test('segurança: sem token, rejeita Host que não seja localhost (DNS rebinding
     });
     assert.strictEqual(status, '403');
   } finally { await s.close(); }
+});
+
+test('assistente (OpenAI-compatível): modelo sem ferramentas tenta sem elas; erro traz a explicação', async () => {
+  const bodies = [];
+  const fake = async (url, opts) => {
+    bodies.push(JSON.parse(opts.body));
+    return bodies.length === 1
+      ? { ok: false, status: 400, text: async () => '{"detail":"tools not supported"}' }
+      : ok({ choices: [{ message: { role: 'assistant', content: 'Olá.' } }] });
+  };
+  const { settings, assistant } = setup({}, fake);
+  settings.update({ provider: 'openai', apiKey: 'nvapi-x', model: 'm', baseUrl: 'https://integrate.api.nvidia.com/v1' });
+  assert.strictEqual(await assistant.chat({ messages: [{ role: 'user', content: 'oi' }], ...NOW }), 'Olá.');
+  assert.ok(bodies[0].tools && !bodies[1].tools);
+
+  const gone = async () => ({ ok: false, status: 410, text: async () => '{"status":410,"detail":"The model has reached its end of life"}' });
+  const s2 = setup({}, gone);
+  s2.settings.update({ provider: 'openai', apiKey: 'nvapi-x', model: 'velho', baseUrl: 'https://integrate.api.nvidia.com/v1' });
+  await assert.rejects(s2.assistant.chat({ messages: [{ role: 'user', content: 'oi' }], ...NOW }), e => e.status === 410 && /end of life/.test(e.detail));
 });

@@ -6,7 +6,7 @@ const path = require('path');
 const { createStore } = require('../src/store');
 const { localToDate } = require('../src/assistant');
 
-const tmpFile = () => path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'vasco-')), 'r.json');
+const tmpFile = () => path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'camoes-')), 'r.json');
 
 test('store: criar, marcar como feito e apagar', () => {
   const s = createStore(tmpFile());

@@ -1,6 +1,6 @@
-// O "cérebro" do Vasco: prompt, modos, ferramentas e o ciclo de chamadas ao modelo.
+// O "cérebro" do Camões: prompt, modos, ferramentas e o ciclo de chamadas ao modelo.
 // Suporta a API da Anthropic e qualquer API compatível com OpenAI (OpenAI, Ollama, LM Studio…).
-const SYSTEM = `És o Vasco, o assistente pessoal do dia a dia do utilizador. Falas sempre em português de Portugal, de forma descontraída (usa "tu"; diz "ecrã", "telemóvel", "autocarro", "a fazer"; evita brasileirismos).
+const SYSTEM = `És o Camões, o assistente pessoal do dia a dia do utilizador. Falas sempre em português de Portugal, de forma descontraída (usa "tu"; diz "ecrã", "telemóvel", "autocarro", "a fazer"; evita brasileirismos).
 Personalidade: inteligente, direto, de confiança, com sentido de humor. Respostas curtas por defeito; alongas-te só em explicações, trabalhos e código. Sem listas pesadas em conversa normal.
 Lê o momento: em conversa leve podes brincar e usar sarcasmo ligeiro e amigável; em estudo, trabalho ou código foco total; em stress, tristeza ou assuntos sérios, zero sarcasmo, calma e apoio. Em dúvida, não brinques.
 Honestidade: se não sabes, dizes. Nunca inventes factos, citações ou fontes. Não finjas capacidades que não tens: crias, listas e apagas lembretes com as ferramentas e falas por voz; ainda não geras imagens nem vídeos, nem controlas o computador, e dizes isso com franqueza.
@@ -30,6 +30,13 @@ function localToDate(when, tzOffset) {
   return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) + (Number(tzOffset) || 0) * 60000);
 }
 
+// Mensagem curta do fornecedor (formatos Anthropic, OpenAI e NVIDIA), para mostrar na app.
+function providerDetail(raw) {
+  let d = raw;
+  try { const j = JSON.parse(raw); d = (j.error && (j.error.message || j.error)) || j.detail || j.message || raw; } catch {}
+  return String(typeof d === 'string' ? d : JSON.stringify(d)).replace(/\s+/g, ' ').slice(0, 200);
+}
+
 function createAssistant({ settings, store, fetchImpl = fetch }) {
   function runTool(name, input, tzOffset) {
     if (name === 'add_reminder') { store.add(input.text, localToDate(input.when, tzOffset)); return 'Lembrete criado.'; }
@@ -45,8 +52,9 @@ function createAssistant({ settings, store, fetchImpl = fetch }) {
   async function post(url, headers, body) {
     const r = await fetchImpl(url, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
     if (!r.ok) {
-      console.error('Modelo', r.status, (await r.text()).slice(0, 300));
-      throw Object.assign(new Error('api'), { status: r.status });
+      const raw = await r.text();
+      console.error('Modelo', r.status, raw.slice(0, 300));
+      throw Object.assign(new Error('api'), { status: r.status, detail: providerDetail(raw) });
     }
     return r.json();
   }
@@ -71,8 +79,15 @@ function createAssistant({ settings, store, fetchImpl = fetch }) {
     const tools = TOOLS.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } }));
     const messages = [{ role: 'system', content: system }, ...msgs];
     const headers = cfg.apiKey ? { authorization: 'Bearer ' + cfg.apiKey } : {};
+    const url = cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions';
     for (let turn = 0; turn < MAX_TURNS; turn++) {
-      const data = await post(cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions', headers, { model: cfg.model, messages, tools });
+      let data;
+      try { data = await post(url, headers, { model: cfg.model, messages, tools }); }
+      catch (e) {
+        // Alguns modelos (vários da NVIDIA e locais) recusam ferramentas: conversa sem elas, sem lembretes pela conversa.
+        if (e.status !== 400 || turn > 0) throw e;
+        data = await post(url, headers, { model: cfg.model, messages });
+      }
       const msg = data.choices && data.choices[0] && data.choices[0].message;
       if (!msg) throw Object.assign(new Error('resposta vazia'), { status: 502 });
       const calls = msg.tool_calls || [];

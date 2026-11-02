@@ -1,4 +1,4 @@
-// Conversa com o Vasco.
+// Conversa com o Camões.
 import { $, toLocal } from './util.js';
 import { api } from './api.js';
 import { setState } from './orb.js';
@@ -19,11 +19,11 @@ function bubble(cls, text) {
 function errText(e) {
   if (e.code === 'sem_chave') return 'Ainda não há API configurada. Abre Definições e escolhe o fornecedor, o modelo e a chave.';
   if (e.code === 'chave') return 'O fornecedor recusou a chave da API. Confirma-a em Definições.';
-  if (e.code === 'origem') return 'Pedido bloqueado por segurança. Abre o Vasco pelo endereço do servidor.';
+  if (e.code === 'origem') return 'Pedido bloqueado por segurança. Abre o Camões pelo endereço do servidor.';
   if (e.status === 429) return 'Calma aí, estás a ir depressa demais. Tenta daqui a pouco.';
   if (e.status === 401) return 'Código de acesso errado. Recarrega a página e tenta outra vez.';
-  if (e.status === 502) return 'O modelo não respondeu. Tenta outra vez.';
-  return 'Não consegui falar com o servidor Vasco. Está ligado?';
+  if (e.status === 502) return 'O modelo não respondeu' + (e.detail ? ` (${e.upstream}: ${e.detail})` : '') + '. Confirma o modelo em Definições.';
+  return 'Não consegui falar com o servidor Camões. Está ligado?';
 }
 
 export async function send(text) {
@@ -40,7 +40,7 @@ export async function send(text) {
       now: now.toLocaleString('pt-PT', { dateStyle: 'full', timeStyle: 'short' }) + ' (hora local, ISO ' + toLocal(now) + ')',
     });
     reply = r.text || '…'; out.textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
-    loadRem(); // o Vasco pode ter criado ou apagado lembretes
+    loadRem(); // o Camões pode ter criado ou apagado lembretes
   } catch (e) {
     hist.pop(); out.textContent = errText(e);
   }

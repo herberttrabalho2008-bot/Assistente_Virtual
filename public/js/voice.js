@@ -1,4 +1,4 @@
-// Voz: reconhecimento (microfone) e síntese (o Vasco a falar).
+// Voz: reconhecimento (microfone) e síntese (o Camões a falar).
 import { $, toast } from './util.js';
 import { setState, pulseKick } from './orb.js';
 

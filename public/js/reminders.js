@@ -11,9 +11,9 @@ export const setServiceWorker = r => { swReg = r; };
 export async function loadRem() {
   try {
     reminders = await api('GET', '/api/reminders');
-    $('#sy').textContent = 'Sincronizado com o teu servidor Vasco.';
+    $('#sy').textContent = 'Sincronizado com o teu servidor Camões.';
     render(); check();
-  } catch (e) { $('#sy').textContent = 'Sem ligação ao servidor Vasco.'; }
+  } catch (e) { $('#sy').textContent = 'Sem ligação ao servidor Camões.'; }
 }
 export async function addRem(text, when) {
   const d = new Date(when); if (isNaN(d)) throw new Error('data inválida');
@@ -26,7 +26,7 @@ function render() {
   const box = $('#list'); box.textContent = '';
   const s = [...reminders].sort((a, b) => (a.done - b.done) || (new Date(a.when) - new Date(b.when)));
   if (!s.length) {
-    const p = document.createElement('p'); p.className = 'note'; p.textContent = 'Sem lembretes. Adiciona um acima ou pede ao Vasco.'; box.append(p); return;
+    const p = document.createElement('p'); p.className = 'note'; p.textContent = 'Sem lembretes. Adiciona um acima ou pede ao Camões.'; box.append(p); return;
   }
   for (const r of s) {
     const el = document.createElement('div');
@@ -52,7 +52,7 @@ async function check() {
   toast('Lembrete: ' + msg);
   try {
     if (window.Notification && Notification.permission === 'granted') {
-      if (swReg) swReg.showNotification('Vasco', { body: msg, icon: 'icon-192.png' }); else new Notification('Vasco', { body: msg });
+      if (swReg) swReg.showNotification('Camões', { body: msg, icon: 'icon-192.png' }); else new Notification('Camões', { body: msg });
     }
   } catch (e) {}
   if (isOn()) speak('Lembrete: ' + msg, () => {});

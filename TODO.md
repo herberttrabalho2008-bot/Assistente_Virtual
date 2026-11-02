@@ -6,7 +6,7 @@ Estado a 2026-11-02. Ordenadas por prioridade dentro de cada secção.
 
 - [ ] Conversa com a API real da Anthropic: confirmar que o pedido, as ferramentas e os erros se comportam como nos testes com `fetch` falso (usar **Testar** em Definições).
 - [ ] Conversa com uma API compatível com OpenAI (OpenAI e, sobretudo, Ollama ou LM Studio), incluindo chamadas de ferramentas: nem todos os modelos locais as suportam.
-- [ ] Voz no PC: microfone, reconhecimento em pt-PT, voz do Vasco e o ciclo ouvir/responder.
+- [ ] Voz no PC: microfone, reconhecimento em pt-PT, voz do Camões e o ciclo ouvir/responder.
 - [ ] Telemóvel real: instalação como app, voz, notificações e o campo de texto (Enter faz nova linha).
 - [ ] Erro na consola "An unknown error occurred when fetching the script": causa por confirmar (suspeita: registo do service worker).
 
@@ -31,7 +31,7 @@ Estado a 2026-11-02. Ordenadas por prioridade dentro de cada secção.
 - [ ] Correr a skill `revisao-seguranca` e guardar o relatório fora do repositório.
 - [ ] Acrescentar uma licença ao repositório.
 - [ ] Registar a origem e a revisão das skills em `.claude/skills/` num documento do projeto (só se for preciso; as skills não vão para o GitHub).
-- [ ] Escolher a voz do Vasco de forma menos frágil (hoje procura nomes de vozes conhecidas).
+- [ ] Escolher a voz do Camões de forma menos frágil (hoje procura nomes de vozes conhecidas).
 
 ## Já feito
 

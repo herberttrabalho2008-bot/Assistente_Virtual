@@ -16,15 +16,15 @@ function loadEnvFile(file) {
 }
 
 function loadConfig(env = process.env) {
-  const token = env.VASCO_TOKEN || '';
+  const token = env.CAMOES_TOKEN || '';
   return {
     port: Number(env.PORT) || 3000,
     token,
     // Sem token, só aceita ligações deste computador. Com token, fica acessível na rede.
     host: env.HOST || (token ? '0.0.0.0' : '127.0.0.1'),
     publicDir: path.join(ROOT, 'public'),
-    dataFile: env.VASCO_DATA || path.join(ROOT, 'data', 'reminders.json'),
-    settingsFile: env.VASCO_SETTINGS || path.join(ROOT, 'data', 'settings.json'),
+    dataFile: env.CAMOES_DATA || path.join(ROOT, 'data', 'reminders.json'),
+    settingsFile: env.CAMOES_SETTINGS || path.join(ROOT, 'data', 'settings.json'),
   };
 }
 

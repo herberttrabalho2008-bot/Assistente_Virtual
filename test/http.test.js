@@ -9,7 +9,7 @@ const { createAssistant } = require('../src/assistant');
 const { createServer } = require('../src/http');
 
 async function start(over = {}, env = {}, fetchImpl) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vasco-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'camoes-'));
   const config = { token: '', publicDir: path.join(__dirname, '..', 'public'), ...over };
   const store = createStore(path.join(dir, 'r.json'));
   const settings = createSettings(path.join(dir, 's.json'), env);
@@ -36,8 +36,8 @@ test('auth: exige o token quando definido', async () => {
   const s = await start({ token: 'segredo' });
   try {
     assert.strictEqual((await fetch(s.base + '/api/reminders')).status, 401);
-    assert.strictEqual((await fetch(s.base + '/api/reminders', { headers: { 'x-vasco-token': 'errado' } })).status, 401);
-    assert.strictEqual((await fetch(s.base + '/api/reminders', { headers: { 'x-vasco-token': 'segredo' } })).status, 200);
+    assert.strictEqual((await fetch(s.base + '/api/reminders', { headers: { 'x-camoes-token': 'errado' } })).status, 401);
+    assert.strictEqual((await fetch(s.base + '/api/reminders', { headers: { 'x-camoes-token': 'segredo' } })).status, 200);
   } finally { await s.close(); }
 });
 

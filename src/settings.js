@@ -21,17 +21,17 @@ function createSettings(file, env = {}) {
   function profile(name, saved) {
     const s = (saved.profiles || {})[name] || {};
     const envKey = name === 'anthropic' ? env.ANTHROPIC_API_KEY : env.OPENAI_API_KEY;
-    const envModel = name === 'anthropic' ? env.VASCO_MODEL : env.VASCO_OPENAI_MODEL;
+    const envModel = name === 'anthropic' ? env.CAMOES_MODEL : env.CAMOES_OPENAI_MODEL;
     const p = {
       apiKey: s.apiKey || envKey || '',
       keySource: s.apiKey ? 'definições' : envKey ? 'ambiente' : '',
       model: s.model || envModel || DEFAULT_MODEL[name],
     };
-    if (name === 'openai') p.baseUrl = s.baseUrl || env.VASCO_OPENAI_BASE_URL || DEFAULT_BASE;
+    if (name === 'openai') p.baseUrl = s.baseUrl || env.CAMOES_OPENAI_BASE_URL || DEFAULT_BASE;
     return p;
   }
   const activeName = saved => {
-    const p = saved.provider || env.VASCO_PROVIDER;
+    const p = saved.provider || env.CAMOES_PROVIDER;
     return PROVIDERS.includes(p) ? p : 'anthropic';
   };
 

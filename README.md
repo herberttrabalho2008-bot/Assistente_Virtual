@@ -1,4 +1,6 @@
-# VASCO
+<p align="center"><img src="imagens/logo.png" alt="Logo do Camões" width="140"></p>
+
+# Camões
 
 Assistente virtual pessoal em português de Portugal, inspirado no JARVIS. Corre no teu PC e usas no PC e no telemóvel (como app instalável).
 
@@ -10,7 +12,7 @@ Assistente virtual pessoal em português de Portugal, inspirado no JARVIS. Corre
 
 | PC | Telemóvel |
 | --- | --- |
-| ![VASCO no PC](docs/ecra-pc.png) | ![VASCO no telemóvel](docs/ecra-telemovel.png) |
+| ![Camões no PC](imagens/ecra-pc.png) | ![Camões no telemóvel](imagens/ecra-telemovel.png) |
 
 ## Guião rápido
 
@@ -34,7 +36,7 @@ No Windows, faz duplo clique em `iniciar.bat`. Em qualquer sistema:
 npm start
 ```
 
-Deve aparecer `VASCO a correr em http://localhost:3000`. Deixa essa janela aberta: se a fechares, o Vasco pára. Para parar, carrega em `Ctrl+C`.
+Deve aparecer `Camões a correr em http://localhost:3000`. Deixa essa janela aberta: se a fechares, o Camões pára. Para parar, carrega em `Ctrl+C`.
 
 ### 3. Escolher a API
 
@@ -51,20 +53,20 @@ A chave fica só no teu computador (`data/settings.json`, fora do Git) e nunca v
 
 - **Escrever:** abre a conversa e escreve a mensagem.
 - **Falar:** carrega no botão do microfone (precisa de Chrome ou Edge).
-- **Lembretes:** adiciona-os na lista, ou pede ao Vasco, por exemplo "lembra-me de ligar à mãe às 19h".
+- **Lembretes:** adiciona-os na lista, ou pede ao Camões, por exemplo "lembra-me de ligar à mãe às 19h".
 - **Modos:** muda entre Geral, Estudo, Programação e Criativo para mudar o estilo das respostas.
 
 Sem API configurada, os lembretes funcionam na mesma. Só a conversa fica desligada.
 
 ## Usar no telemóvel
 
-O telemóvel tem de conseguir chegar ao PC onde o Vasco está a correr. Antes de abrires o Vasco à rede, tens de definir um código de acesso.
+O telemóvel tem de conseguir chegar ao PC onde o Camões está a correr. Antes de abrires o Camões à rede, tens de definir um código de acesso.
 
-1. Copia `.env.example` para `.env` e preenche `VASCO_TOKEN` com um código longo e aleatório. Sem ele, o Vasco só aceita ligações do próprio PC.
-2. Reinicia o Vasco. Com o código definido, passa a aceitar ligações de outros dispositivos.
-3. No telemóvel, abre o endereço do Vasco. A app pede o código na primeira vez e guarda-o.
+1. Copia `.env.example` para `.env` e preenche `CAMOES_TOKEN` com um código longo e aleatório. Sem ele, o Camões só aceita ligações do próprio PC.
+2. Reinicia o Camões. Com o código definido, passa a aceitar ligações de outros dispositivos.
+3. No telemóvel, abre o endereço do Camões. A app pede o código na primeira vez e guarda-o.
 
-Há duas formas de chegar ao Vasco, e a escolha importa:
+Há duas formas de chegar ao Camões, e a escolha importa:
 
 | Forma | O que funciona |
 | --- | --- |
@@ -75,7 +77,7 @@ Para ter HTTPS usa um túnel ou um servidor com certificado, por exemplo Tailsca
 
 Para instalar a app: no Chrome (Android) usa "Instalar app"; no Safari (iPhone) usa Partilhar e "Adicionar ao ecrã principal".
 
-**Cuidado:** nunca expões o Vasco à internet sem `VASCO_TOKEN`. Quem lá entrar gasta a tua chave da API e pode mudar as definições. Define também um limite de gastos na conta da API.
+**Cuidado:** nunca expões o Camões à internet sem `CAMOES_TOKEN`. Quem lá entrar gasta a tua chave da API e pode mudar as definições. Define também um limite de gastos na conta da API.
 
 ## Configuração (opcional)
 
@@ -85,26 +87,26 @@ Tudo se pode fazer em **Definições**. Se preferires ficheiro, copia `.env.exam
 | --- | --- |
 | `ANTHROPIC_API_KEY` | Chave da Anthropic |
 | `OPENAI_API_KEY` | Chave da OpenAI |
-| `VASCO_TOKEN` | Código de acesso (obrigatório fora do PC) |
+| `CAMOES_TOKEN` | Código de acesso (obrigatório fora do PC) |
 | `PORT` | Porta do servidor (por omissão 3000) |
-| `VASCO_PROVIDER` | `anthropic` ou `openai` |
-| `VASCO_MODEL`, `VASCO_OPENAI_MODEL` | Modelo de cada fornecedor |
-| `VASCO_OPENAI_BASE_URL` | Endereço da API compatível com OpenAI |
+| `CAMOES_PROVIDER` | `anthropic` ou `openai` |
+| `CAMOES_MODEL`, `CAMOES_OPENAI_MODEL` | Modelo de cada fornecedor |
+| `CAMOES_OPENAI_BASE_URL` | Endereço da API compatível com OpenAI |
 
 ## Problemas comuns
 
 - **`node` não é reconhecido:** o Node.js não está instalado, ou é preciso fechar e abrir de novo o terminal.
-- **A porta 3000 já está em uso:** o Vasco já está a correr noutra janela, ou outro programa usa a porta. Fecha-o, ou muda `PORT` no `.env`.
+- **A porta 3000 já está em uso:** o Camões já está a correr noutra janela, ou outro programa usa a porta. Fecha-o, ou muda `PORT` no `.env`.
 - **A conversa dá erro de chave:** abre Definições, confirma a chave e clica em **Testar**.
 - **Modelo local não responde:** confirma que o Ollama ou o LM Studio está aberto e que o nome do modelo está certo.
 - **O microfone não funciona no telemóvel:** precisa de HTTPS (ver acima). No Firefox a voz não funciona.
-- **Os dados do Vasco:** lembretes e definições ficam na pasta `data/`. Apaga-a para recomeçar do zero.
+- **Os dados do Camões:** lembretes e definições ficam na pasta `data/`. Apaga-a para recomeçar do zero.
 
 ## Limitações
 
 - Os avisos de lembretes só aparecem com a app aberta. Com a app fechada seria preciso Web Push, que ainda não está feito.
 - A voz usa o reconhecimento do browser. No Chrome, o áudio vai para a Google.
-- O Vasco não controla o PC.
+- O Camões não controla o PC.
 - O histórico da conversa perde-se quando recarregas a página.
 - O servidor limita a 20 mensagens por minuto por IP, mas isso não substitui um limite de gastos na conta da API.
 
@@ -114,7 +116,7 @@ A lista do que falta fazer está em [TODO.md](TODO.md).
 
 ```bash
 npm test         # testes do servidor (node --test)
-npm run icons    # volta a gerar os ícones PNG
+npm run icons    # volta a gerar a logo e os ícones
 ```
 
 ```
@@ -131,8 +133,8 @@ public/              a app (sem build: módulos ES nativos)
   css/style.css
   js/                main, chat, voice, reminders, orb, settings, ui, api, util
 test/                testes do servidor
-tools/make-icons.js  gera os ícones PNG
-docs/                imagens do ecrã usadas neste README
+tools/make-icons.js  desenha a logo e gera os ícones
+imagens/             logo (logo.png, gerada por npm run icons) e imagens do ecrã
 legacy/              protótipos originais (só funcionavam dentro do claude.ai)
 data/                lembretes e definições (criada ao correr; fora do Git)
 ```
