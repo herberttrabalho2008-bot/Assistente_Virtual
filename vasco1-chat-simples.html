@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vasco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F4F8;--surf:#FFFFFF;--ink:#14202E;--mute:#5B6B7C;--line:#D5DDE6;--azul:#1D4E9E;--azul-ink:#FFFFFF;--ocre:#B7791F;--me:#1D4E9E;--me-ink:#FFFFFF;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1722;--surf:#15232F;--ink:#E8EEF4;--mute:#92A3B5;--line:#263747;--azul:#6FA3EE;--azul-ink:#0D1722;--ocre:#E6B04F;--me:#2A5FB3;--me-ink:#FFFFFF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1722;--surf:#15232F;--ink:#E8EEF4;--mute:#92A3B5;--line:#263747;--azul:#6FA3EE;--azul-ink:#0D1722;--ocre:#E6B04F;--me:#2A5FB3;--me-ink:#FFFFFF;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;display:flex;flex-direction:column;max-width:760px;margin:0 auto}
+header{padding:14px 18px 10px;display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--azul)}
+.sub{color:var(--mute);font-size:14px}
+nav{display:flex;gap:6px;padding:10px 18px 0}
+nav button{flex:1;padding:10px;border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;background:transparent;color:var(--mute);font:inherit;font-weight:600;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--surf);color:var(--ink)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--surf);border-top:1px solid var(--line)}
+section{display:none;flex:1;min-height:0;flex-direction:column}
+section.on{display:flex}
+#log{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.v{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.u{align-self:flex-end;background:var(--me);color:var(--me-ink);border-bottom-right-radius:4px}
+.hint{color:var(--mute);text-align:center;margin:auto;max-width:30ch}
+form.bar{display:flex;gap:8px;padding:10px 18px 14px;border-top:1px solid var(--line)}
+textarea,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+textarea{flex:1;resize:none;max-height:120px}
+button.go{border:0;border-radius:12px;background:var(--azul);color:var(--azul-ink);font:inherit;font-weight:600;padding:0 18px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+#rem{padding:16px 18px;overflow-y:auto}
+.add{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.add input[type=text]{flex:1 1 200px}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item .t{flex:1;overflow-wrap:anywhere}
+.item .w{color:var(--mute);font-size:14px}
+.item.done .t{text-decoration:line-through;color:var(--mute)}
+.item.late .w{color:var(--ocre);font-weight:600}
+.x{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;padding:4px 8px}
+.note{color:var(--mute);font-size:14px;margin:8px 0}
+#alert{display:none;background:var(--ocre);color:#14202E;padding:10px 18px;font-weight:600}
+</style>
+</head>
+<body>
+<header><h1>Vasco</h1><span class="sub" id="st">a ligar…</span></header>
+<div id="alert" role="alert"></div>
+<nav role="tablist">
+<button role="tab" id="tc" aria-selected="true">Conversa</button>
+<button role="tab" id="tl" aria-selected="false">Lembretes</button>
+</nav>
+<main>
+<section id="chat" class="on">
+<div id="log"><p class="hint" id="empty">Fala com o Vasco. Pede-lhe ajuda nos estudos, em código ou diz “lembra-me de ligar à mãe às 19h”.</p></div>
+<form class="bar" id="f"><textarea id="q" rows="1" placeholder="Diz lá…" aria-label="Mensagem"></textarea><button class="go" id="s">Enviar</button></form>
+</section>
+<section id="lem">
+<div id="rem">
+<form class="add" id="fa"><input type="text" id="rt" placeholder="O que queres recordar?" required aria-label="Lembrete"><input type="datetime-local" id="rw" required aria-label="Quando"><button class="go" style="padding:10px 18px">Adicionar</button></form>
+<div id="list"></div>
+<p class="note" id="sy"></p>
+<button class="go" id="nb" style="padding:10px 16px;display:none">Ativar avisos no ecrã</button>
+</div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const LS='vasco_rem_v1';
+let reminders=[],col=null,synced=false,hist=[],busy=false,sample=null;
+
+function pad(n){return String(n).padStart(2,'0')}
+function toLocal(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function fmt(iso){const d=new Date(iso);return d.toLocaleString('pt-PT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function lsLoad(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){return[]}}
+function lsSave(){try{localStorage.setItem(LS,JSON.stringify(reminders))}catch(e){}}
+
+/* ---------- lembretes ---------- */
+async function addRem(text,when){
+  const d=new Date(when);if(isNaN(d))throw new Error('data inválida');
+  const id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const o={text:text,when:d.toISOString(),done:false};
+  if(col){await col.doc(id).set(o)}else{reminders.push({id:id,...o});lsSave();renderRem()}
+  return id;
+}
+async function setDone(id){
+  if(col){await col.doc(id).update({done:true})}
+  else{const r=reminders.find(x=>x.id===id);if(r){r.done=true;lsSave();renderRem()}}
+}
+async function delRem(id){
+  if(col){await col.doc(id).delete()}
+  else{reminders=reminders.filter(x=>x.id!==id);lsSave();renderRem()}
+}
+function renderRem(){
+  const box=$('#list');box.textContent='';
+  const sorted=[...reminders].sort((a,b)=>(a.done-b.done)||(new Date(a.when)-new Date(b.when)));
+  if(!sorted.length){const p=document.createElement('p');p.className='note';p.textContent='Sem lembretes. Adiciona um acima ou pede ao Vasco na conversa.';box.append(p);return}
+  const now=Date.now();
+  for(const r of sorted){
+    const el=document.createElement('div');
+    el.className='item'+(r.done?' done':'')+(!r.done&&new Date(r.when)<now?' late':'');
+    const t=document.createElement('div');t.className='t';t.textContent=r.text;
+    const w=document.createElement('div');w.className='w';w.textContent=fmt(r.when);
+    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Apagar lembrete');
+    x.onclick=()=>delRem(r.id);
+    if(!r.done){const ok=document.createElement('button');ok.className='x';ok.textContent='✓';ok.setAttribute('aria-label','Marcar como feito');ok.onclick=()=>setDone(r.id);el.append(ok)}
+    el.append(t,w,x);box.append(el);
+  }
+}
+const fired=new Set();
+function check(){
+  const now=Date.now();
+  for(const r of reminders){
+    if(r.done||fired.has(r.id))continue;
+    if(new Date(r.when)<=now){
+      fired.add(r.id);
+      const a=$('#alert');a.style.display='block';a.textContent='Lembrete: '+r.text;
+      try{if(window.Notification&&Notification.permission==='granted')new Notification('Vasco',{body:r.text})}catch(e){}
+      setDone(r.id);
+      setTimeout(()=>{a.style.display='none'},15000);
+    }
+  }
+}
+setInterval(check,15000);
+
+/* ---------- ligação (sincronização) ---------- */
+function useLocal(){
+  reminders=lsLoad();renderRem();
+  $('#st').textContent='só neste dispositivo';
+  $('#sy').textContent='Os lembretes ficam guardados apenas neste dispositivo. Para os ter no telemóvel e no PC, abre o Vasco com a tua conta Claude.';
+  check();
+}
+(async()=>{
+  try{
+    const c=window.claude;
+    if(c){
+      const [db,user]=await Promise.all([c.use('db'),c.use('user')]);
+      const uid=user&&db?await user.id():null;
+      if(uid){
+        col=db.collection('data/users/'+uid);
+        col.onSnapshot(s=>{reminders=s.docs.map(d=>({id:d.id,...d.data()}));synced=true;renderRem();check()},()=>{col=null;useLocal()});
+        $('#st').textContent='sincronizado com a tua conta';
+        $('#sy').textContent='Os lembretes aparecem no telemóvel e no PC onde abrires o Vasco com a tua conta.';
+      }
+      sample=await c.use('sample');
+    }
+  }catch(e){}
+  if(!col)useLocal();
+  if(!sample)$('#st').textContent+=' · conversa indisponível aqui';
+})();
+
+/* ---------- conversa ---------- */
+const SYS=`És o Vasco, o assistente pessoal do dia a dia do utilizador. Falas sempre em português de Portugal, de forma descontraída (usa "tu"; diz "ecrã", "telemóvel", "autocarro", "a fazer"; evita brasileirismos).
+Personalidade: inteligente, direto, de confiança, com sentido de humor. Respostas curtas por defeito; alongas-te só em explicações, trabalhos e código. Sem listas pesadas em conversa normal.
+Lê o momento: em conversa leve podes brincar e usar sarcasmo ligeiro e amigável; em estudo, trabalho ou código foco total; em stress, tristeza ou assuntos sérios, zero sarcasmo, calma e apoio. Em dúvida, não brinques.
+Honestidade: se não sabes, dizes. Nunca inventes factos, citações ou fontes. Dá razão só quando a há. Não finjas capacidades que não tens: nesta app consegues criar, listar e apagar lembretes com as ferramentas; ainda não geras imagens, vídeos nem voz, e dizes isso com franqueza se pedirem.
+Lembretes: usa add_reminder. Se faltar o dia ou a hora, pergunta. Confirma de forma curta.
+Sem palavrões. Em saúde, dinheiro ou lei, informas mas lembras que não substituis um profissional.`;
+
+const tools=[
+ {name:'add_reminder',description:'Cria um lembrete. "when" é data e hora locais do utilizador no formato YYYY-MM-DDTHH:mm.',inputSchema:{type:'object',properties:{text:{type:'string'},when:{type:'string'}},required:['text','when']},execute:async i=>{await addRem(i.text,i.when);return 'Lembrete criado para '+fmt(i.when)}},
+ {name:'list_reminders',description:'Lista os lembretes do utilizador (com id).',inputSchema:{type:'object',properties:{}},execute:async()=>JSON.stringify(reminders.map(r=>({id:r.id,text:r.text,when:r.when,done:r.done})))},
+ {name:'delete_reminder',description:'Apaga um lembrete pelo id.',inputSchema:{type:'object',properties:{id:{type:'string'}},required:['id']},execute:async i=>{await delRem(i.id);return 'Apagado'}}
+];
+
+function bubble(cls,text){
+  const e=$('#empty');if(e)e.remove();
+  const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;
+  const l=$('#log');l.append(d);l.scrollTop=l.scrollHeight;return d;
+}
+async function send(text){
+  if(busy||!text.trim())return;
+  if(!sample){bubble('v','A conversa não está disponível nesta vista. Abre o Vasco no claude.ai com a tua conta.');return}
+  busy=true;$('#s').disabled=true;
+  bubble('u',text);hist.push({role:'user',content:text});
+  const out=bubble('v','…');
+  const now=new Date();
+  let msgs=hist.slice(-16);
+  while(msgs.length&&msgs[0].role!=='user')msgs=msgs.slice(1);
+  msgs=msgs.map((m,i)=>i===0?{role:'user',content:SYS+'\n\nAgora é '+now.toLocaleString('pt-PT',{dateStyle:'full',timeStyle:'short'})+' (hora local, ISO '+toLocal(now)+').\n\n--- Conversa ---\n'+m.content}:m);
+  try{
+    const r=await sample(msgs,{tools:tools,cache:false,onText:u=>{out.textContent=u.text;$('#log').scrollTop=1e9}});
+    out.textContent=r.text;hist.push({role:'assistant',content:r.text});
+  }catch(e){
+    hist.pop();
+    out.textContent=e&&e.code==='rate_limited'?'Calma aí, estás a ir depressa demais. Tenta daqui a pouco.':e&&e.code==='not_granted'?'Preciso da tua autorização para falar contigo. Tenta enviar outra vez e aceita o pedido.':'Algo correu mal. Tenta outra vez.';
+  }
+  busy=false;$('#s').disabled=false;$('#q').focus();
+}
+$('#f').onsubmit=e=>{e.preventDefault();const t=$('#q').value;$('#q').value='';send(t)};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#f').requestSubmit()}});
+
+/* ---------- separadores e formulário ---------- */
+function tab(w){
+  $('#chat').classList.toggle('on',w==='c');$('#lem').classList.toggle('on',w==='l');
+  $('#tc').setAttribute('aria-selected',w==='c');$('#tl').setAttribute('aria-selected',w==='l');
+}
+$('#tc').onclick=()=>tab('c');$('#tl').onclick=()=>tab('l');
+$('#rw').value=toLocal(new Date(Date.now()+3600e3));
+$('#fa').onsubmit=async e=>{
+  e.preventDefault();
+  try{await addRem($('#rt').value.trim(),$('#rw').value);$('#rt').value=''}catch(x){}
+};
+try{if(window.Notification&&Notification.permission==='default'){const b=$('#nb');b.style.display='inline-block';b.onclick=async()=>{try{await Notification.requestPermission()}catch(e){}b.style.display='none'}}}catch(e){}
+</script>
+</body>
+</html>

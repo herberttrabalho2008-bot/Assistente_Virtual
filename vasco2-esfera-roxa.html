@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vasco</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#0C2A1B;--bg2:#030805;--ink:#E8FFF1;--mute:#8FB5A0;--glass:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--pink:#22E58B;--vio:#86EFAC;color-scheme:dark;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(ellipse at 50% 30%,var(--bg1),var(--bg2) 70%);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px 0;max-width:780px;width:100%;margin:0 auto}
+#orb{width:min(300px,62vw);aspect-ratio:1;transition:width .6s cubic-bezier(.2,.8,.2,1);flex:none}
+body.on .stage{justify-content:flex-start}
+body.on #orb{width:92px}
+#hd{margin:18px 0 0;font-size:clamp(22px,4.6vw,30px);font-weight:800;letter-spacing:-.01em;background:linear-gradient(90deg,var(--vio),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;min-height:1.3em;filter:drop-shadow(0 0 14px rgba(34,229,139,.35))}
+body.on #hd{font-size:15px;margin:4px 0 6px;filter:none}
+#log,#rp{display:none;flex:1;min-height:0;width:100%;overflow-y:auto;padding:8px 2px 14px;flex-direction:column;gap:10px}
+body.on #log.show,body.on #rp.show{display:flex}
+.msg{max-width:88%;padding:10px 14px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.msg.v{align-self:flex-start;background:var(--glass);border:1px solid var(--line);border-bottom-left-radius:5px}
+.msg.u{align-self:flex-end;background:linear-gradient(135deg,#16A34A,#0E7A3B);border-bottom-right-radius:5px}
+.dock{margin:0 auto 14px;width:calc(100% - 24px);max-width:760px;background:var(--glass);border:1px solid var(--line);border-radius:26px;padding:10px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.roles{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.roles::-webkit-scrollbar{display:none}
+.roles button{flex:none;border:0;background:transparent;color:var(--mute);font:inherit;font-weight:600;font-size:14px;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.roles button[aria-pressed="true"]{background:rgba(255,255,255,.1);color:var(--ink)}
+.row{display:flex;align-items:flex-end;gap:6px;background:rgba(255,255,255,.07);border-radius:22px;padding:6px 6px 6px 14px}
+textarea{flex:1;background:transparent;border:0;color:var(--ink);font:inherit;resize:none;max-height:110px;padding:8px 0;outline:0}
+textarea::placeholder{color:var(--mute)}
+.ib{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--vio);cursor:pointer;display:grid;place-items:center}
+.ib svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib.mic[aria-pressed="true"]{background:linear-gradient(135deg,#16A34A,#0E7A3B);color:#fff;box-shadow:0 0 18px rgba(34,229,139,.6)}
+.ib:disabled{opacity:.4}
+:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);background:#0F2E1F;border:1px solid var(--line);padding:10px 16px;border-radius:14px;display:none;max-width:90vw;z-index:5;font-size:14px}
+#rp .add{display:flex;flex-wrap:wrap;gap:8px}
+#rp input{background:var(--glass);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:inherit;padding:10px 12px;color-scheme:dark}
+#rp .add input[type=text]{flex:1 1 180px}
+#rp .add button{border:0;border-radius:12px;background:linear-gradient(135deg,#16A34A,#0E7A3B);color:#fff;font:inherit;font-weight:600;padding:0 16px;cursor:pointer;min-height:40px}
+.item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item .t{flex:1;overflow-wrap:anywhere}
+.item .w{color:var(--mute);font-size:13px}
+.item.done .t{text-decoration:line-through;color:var(--mute)}
+.item.late .w{color:#F5C16C;font-weight:600}
+.x{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;padding:4px 8px}
+.note{color:var(--mute);font-size:13px;margin:4px 0}
+@media (prefers-reduced-motion:reduce){#orb{transition:none}}
+</style>
+</head>
+<body>
+<div id="toast" role="alert"></div>
+<div class="stage">
+<canvas id="orb" width="640" height="640" aria-hidden="true"></canvas>
+<h1 id="hd">Como posso ajudar-te hoje?</h1>
+<div id="log" class="show" aria-live="polite"></div>
+<div id="rp">
+<form class="add" id="fa"><input type="text" id="rt" placeholder="O que queres recordar?" required aria-label="Lembrete"><input type="datetime-local" id="rw" required aria-label="Quando"><button>Adicionar</button></form>
+<div id="list"></div>
+<p class="note" id="sy">a ligar…</p>
+</div>
+</div>
+<div class="dock">
+<div class="roles" id="roles">
+<button data-r="geral" aria-pressed="true">Geral</button>
+<button data-r="estudo" aria-pressed="false">Estudo</button>
+<button data-r="codigo" aria-pressed="false">Programação</button>
+<button data-r="criativo" aria-pressed="false">Criativo</button>
+<button data-r="lem" aria-pressed="false">Lembretes</button>
+</div>
+<form class="row" id="f">
+<textarea id="q" rows="1" placeholder="Pergunta-me o que quiseres…" aria-label="Mensagem"></textarea>
+<button type="button" class="ib mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+<button class="ib" id="s" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg></button>
+</form>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const LS='vasco_rem_v1',HEAD='Como posso ajudar-te hoje?';
+let reminders=[],col=null,hist=[],busy=false,sample=null,role='geral',state='idle',voiceOn=false,rec=null;
+const pad=n=>String(n).padStart(2,'0');
+const toLocal=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+const fmt=i=>new Date(i).toLocaleString('pt-PT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const lsLoad=()=>{try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){return[]}};
+const lsSave=()=>{try{localStorage.setItem(LS,JSON.stringify(reminders))}catch(e){}};
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',6000)}
+
+/* ---------- orbe ---------- */
+const cv=$('#orb'),cx=cv.getContext('2d'),W=640,C=W/2;
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let ph=0,pulse=0,last=0,kick=0;
+function orb(t){
+  const dt=Math.min(.05,(t-last)/1000||.016);last=t;
+  const sp={idle:.5,listen:.9,think:2.6,speak:2.4}[state];
+  ph+=dt*sp*(still?.2:1);
+  const k=t/1000;
+  const tgt=state==='listen'?.05+.05*Math.sin(k*7):state==='speak'?.1*(.4+.6*Math.abs(Math.sin(k*9)*Math.sin(k*4.1)))+kick:.02*Math.sin(k*1.6);
+  pulse+=(tgt-pulse)*.2;
+  kick*=.92;const R=W*.27*(1+pulse);
+  cx.clearRect(0,0,W,W);
+  let g=cx.createRadialGradient(C,C,R*.5,C,C,R*1.9);
+  g.addColorStop(0,'rgba(34,229,139,.5)');g.addColorStop(.5,'rgba(20,160,90,.18)');g.addColorStop(1,'rgba(10,120,60,0)');
+  cx.fillStyle=g;cx.fillRect(0,0,W,W);
+  cx.save();cx.beginPath();cx.arc(C,C,R,0,7);cx.clip();
+  g=cx.createRadialGradient(C-R*.25,C-R*.3,R*.05,C,C,R);
+  g.addColorStop(0,'#F0FFF6');g.addColorStop(.6,'#A8F0C4');g.addColorStop(1,'#2EE58A');
+  cx.fillStyle=g;cx.fillRect(0,0,W,W);
+  cx.lineWidth=R*.045;cx.lineCap='round';
+  const N=9;
+  for(let i=0;i<N;i++){
+    const a=ph+i*Math.PI/N,rx=Math.max(R*Math.abs(Math.cos(a)),2);
+    const lg=cx.createLinearGradient(C-R,C-R,C+R,C+R);
+    lg.addColorStop(0,i%2?'#06A64F':'#00FF85');lg.addColorStop(1,i%2?'#0B7A4B':'#7CFFB8');
+    cx.strokeStyle=lg;cx.shadowColor='rgba(0,255,140,.9)';cx.shadowBlur=R*.08;
+    cx.beginPath();cx.ellipse(C,C,rx,R*.97,-.45+Math.sin(k*.4)*.1,0,7);cx.stroke();
+  }
+  cx.restore();
+  cx.shadowBlur=0;cx.strokeStyle='rgba(190,255,220,.7)';cx.lineWidth=3;
+  cx.beginPath();cx.arc(C,C,R,0,7);cx.stroke();
+  requestAnimationFrame(orb);
+}
+requestAnimationFrame(orb);
+function setState(s){
+  state=s;
+  const on=document.body.classList.contains('on');
+  $('#hd').textContent=s==='listen'?'A ouvir…':s==='think'?'A pensar…':s==='speak'?'A falar…':(on?'':HEAD);
+}
+
+/* ---------- lembretes ---------- */
+async function addRem(text,when){
+  const d=new Date(when);if(isNaN(d))throw new Error('data inválida');
+  const id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),o={text:text,when:d.toISOString(),done:false};
+  if(col)await col.doc(id).set(o);else{reminders.push({id:id,...o});lsSave();renderRem()}
+}
+async function setDone(id){if(col)await col.doc(id).update({done:true});else{const r=reminders.find(x=>x.id===id);if(r){r.done=true;lsSave();renderRem()}}}
+async function delRem(id){if(col)await col.doc(id).delete();else{reminders=reminders.filter(x=>x.id!==id);lsSave();renderRem()}}
+function renderRem(){
+  const box=$('#list');box.textContent='';
+  const s=[...reminders].sort((a,b)=>(a.done-b.done)||(new Date(a.when)-new Date(b.when)));
+  if(!s.length){const p=document.createElement('p');p.className='note';p.textContent='Sem lembretes. Adiciona um acima ou pede ao Vasco.';box.append(p);return}
+  for(const r of s){
+    const el=document.createElement('div');
+    el.className='item'+(r.done?' done':'')+(!r.done&&new Date(r.when)<Date.now()?' late':'');
+    if(!r.done){const ok=document.createElement('button');ok.className='x';ok.textContent='✓';ok.setAttribute('aria-label','Marcar como feito');ok.onclick=()=>setDone(r.id);el.append(ok)}
+    const t=document.createElement('div');t.className='t';t.textContent=r.text;
+    const w=document.createElement('div');w.className='w';w.textContent=fmt(r.when);
+    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Apagar lembrete');x.onclick=()=>delRem(r.id);
+    el.append(t,w,x);box.append(el);
+  }
+}
+const fired=new Set();
+function check(){
+  for(const r of reminders){
+    if(r.done||fired.has(r.id)||new Date(r.when)>Date.now())continue;
+    fired.add(r.id);toast('Lembrete: '+r.text);
+    try{if(window.Notification&&Notification.permission==='granted')new Notification('Vasco',{body:r.text})}catch(e){}
+    if(voiceOn)speak('Lembrete: '+r.text,()=>{});
+    setDone(r.id);
+  }
+}
+setInterval(check,15000);
+function useLocal(){reminders=lsLoad();renderRem();$('#sy').textContent='Lembretes guardados só neste dispositivo. Abre o Vasco com a tua conta Claude para os sincronizar.';check()}
+(async()=>{
+  try{
+    const c=window.claude;
+    if(c){
+      const [db,user]=await Promise.all([c.use('db'),c.use('user')]);
+      const uid=user&&db?await user.id():null;
+      if(uid){
+        col=db.collection('data/users/'+uid);
+        col.onSnapshot(s=>{reminders=s.docs.map(d=>({id:d.id,...d.data()}));renderRem();check()},()=>{col=null;useLocal()});
+        $('#sy').textContent='Sincronizado com a tua conta: aparece no telemóvel e no PC.';
+      }
+      sample=await c.use('sample');
+    }
+  }catch(e){}
+  if(!col)useLocal();
+})();
+
+/* ---------- conversa ---------- */
+const SYS=`És o Vasco, o assistente pessoal do dia a dia do utilizador. Falas sempre em português de Portugal, de forma descontraída (usa "tu"; diz "ecrã", "telemóvel", "autocarro", "a fazer"; evita brasileirismos).
+Personalidade: inteligente, direto, de confiança, com sentido de humor. Respostas curtas por defeito; alongas-te só em explicações, trabalhos e código. Sem listas pesadas em conversa normal.
+Lê o momento: em conversa leve podes brincar e usar sarcasmo ligeiro e amigável; em estudo, trabalho ou código foco total; em stress, tristeza ou assuntos sérios, zero sarcasmo, calma e apoio. Em dúvida, não brinques.
+Honestidade: se não sabes, dizes. Nunca inventes factos, citações ou fontes. Não finjas capacidades que não tens: nesta app crias, listas e apagas lembretes com as ferramentas e falas por voz; ainda não geras imagens nem vídeos, e dizes isso com franqueza.
+Lembretes: usa add_reminder. Se faltar o dia ou a hora, pergunta. Confirma de forma curta.
+Sem palavrões. Em saúde, dinheiro ou lei, informas mas lembras que não substituis um profissional.`;
+const ROLES={geral:'',estudo:'Modo estudo: explica passo a passo com exemplos, verifica se a pessoa percebeu e propõe perguntas de treino.',codigo:'Modo programação: código limpo e comentado, vais à causa dos erros e explicas o que fizeste.',criativo:'Modo criativo: ideias, textos e histórias com imaginação; podes ser mais brincalhão.'};
+const tools=[
+ {name:'add_reminder',description:'Cria um lembrete. "when" é data e hora locais no formato YYYY-MM-DDTHH:mm.',inputSchema:{type:'object',properties:{text:{type:'string'},when:{type:'string'}},required:['text','when']},execute:async i=>{await addRem(i.text,i.when);return 'Lembrete criado para '+fmt(i.when)}},
+ {name:'list_reminders',description:'Lista os lembretes (com id).',inputSchema:{type:'object',properties:{}},execute:async()=>JSON.stringify(reminders.map(r=>({id:r.id,text:r.text,when:r.when,done:r.done})))},
+ {name:'delete_reminder',description:'Apaga um lembrete pelo id.',inputSchema:{type:'object',properties:{id:{type:'string'}},required:['id']},execute:async i=>{await delRem(i.id);return 'Apagado'}}
+];
+function bubble(cls,text){
+  document.body.classList.add('on');
+  const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;
+  const l=$('#log');l.append(d);l.scrollTop=l.scrollHeight;return d;
+}
+async function send(text){
+  if(busy||!text.trim())return;
+  go('chat');
+  if(!sample){bubble('v','A conversa não está disponível nesta vista. Abre o Vasco no claude.ai com a tua conta.');return}
+  busy=true;
+  bubble('u',text);hist.push({role:'user',content:text});
+  const out=bubble('v','…');setState('think');
+  const now=new Date();
+  let m=hist.slice(-16);while(m.length&&m[0].role!=='user')m=m.slice(1);
+  m=m.map((x,i)=>i===0?{role:'user',content:SYS+(ROLES[role]?'\n'+ROLES[role]:'')+'\n\nAgora é '+now.toLocaleString('pt-PT',{dateStyle:'full',timeStyle:'short'})+' (hora local, ISO '+toLocal(now)+').\n\n--- Conversa ---\n'+x.content}:x);
+  let ok=false,reply='';
+  try{
+    const r=await sample(m,{tools:tools,cache:false,onText:u=>{out.textContent=u.text;kick=.05;$('#log').scrollTop=1e9}});
+    reply=r.text;out.textContent=reply;hist.push({role:'assistant',content:reply});ok=true;
+  }catch(e){
+    hist.pop();
+    out.textContent=e&&e.code==='rate_limited'?'Calma aí, estás a ir depressa demais. Tenta daqui a pouco.':e&&e.code==='not_granted'?'Preciso da tua autorização para falar contigo. Tenta outra vez e aceita o pedido.':'Algo correu mal. Tenta outra vez.';
+  }
+  busy=false;
+  if(ok&&voiceOn)speak(reply,()=>{if(voiceOn)listen();else setState('idle')});
+  else if(voiceOn)listen();else setState('idle');
+}
+$('#f').onsubmit=e=>{e.preventDefault();const t=$('#q').value;$('#q').value='';$('#q').style.height='';send(t)};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#f').requestSubmit()}});
+$('#q').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(110,e.target.scrollHeight)+'px'});
+
+/* ---------- voz ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function speak(t,done){
+  if(!window.speechSynthesis){done();return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t.replace(/[*_`#>]/g,''));
+  u.lang='pt-PT';u.pitch=.8;u.rate=1;
+  const vs=speechSynthesis.getVoices().filter(v=>/^pt[-_]PT/i.test(v.lang));
+  const v=vs.find(x=>/duarte|joaquim|diogo|pedro|cristiano|male/i.test(x.name)&&!/female|fem/i.test(x.name))||vs[0];
+  if(v)u.voice=v;
+  u.onstart=()=>setState('speak');u.onboundary=()=>{kick=.09};
+  let fin=false;const end=()=>{if(!fin){fin=true;done()}};
+  u.onend=end;u.onerror=end;
+  setState('speak');speechSynthesis.speak(u);
+}
+function listen(){
+  if(!voiceOn||busy)return;
+  if(!SR){voiceOn=false;updMic();toast('Este browser não suporta reconhecimento de voz. Experimenta o Chrome, Edge ou Safari.');return}
+  try{
+    rec=new SR();rec.lang='pt-PT';rec.interimResults=true;rec.continuous=false;
+    let heard='';
+    rec.onresult=e=>{heard='';for(const r of e.results)heard+=r[0].transcript;$('#q').value=heard};
+    rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){voiceOn=false;updMic();toast('O browser bloqueou o microfone. Permite o acesso ao microfone nas definições do site.')}};
+    rec.onend=()=>{
+      if(!voiceOn){setState('idle');return}
+      const t=$('#q').value.trim();
+      if(t){$('#q').value='';send(t)}else setTimeout(listen,300);
+    };
+    setState('listen');rec.start();
+  }catch(e){voiceOn=false;updMic();setState('idle')}
+}
+function updMic(){$('#mic').setAttribute('aria-pressed',voiceOn)}
+$('#mic').onclick=()=>{
+  voiceOn=!voiceOn;updMic();
+  if(voiceOn){go('chat');document.body.classList.add('on');listen()}
+  else{try{rec&&rec.abort()}catch(e){}try{speechSynthesis.cancel()}catch(e){}setState('idle')}
+};
+
+/* ---------- papéis ---------- */
+function go(r){
+  const lem=r==='lem';
+  if(!lem&&r!=='chat'){role=r}
+  document.querySelectorAll('#roles button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===(lem?'lem':role)));
+  $('#log').classList.toggle('show',!lem);$('#rp').classList.toggle('show',lem);
+  if(lem)document.body.classList.add('on');
+  setState(state);
+}
+$('#roles').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.r)};
+$('#rw').value=toLocal(new Date(Date.now()+3600e3));
+$('#fa').onsubmit=async e=>{e.preventDefault();try{await addRem($('#rt').value.trim(),$('#rw').value);$('#rt').value=''}catch(x){}};
+try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission().catch(()=>{})}catch(e){}
+</script>
+</body>
+</html>
