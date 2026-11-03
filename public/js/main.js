@@ -3,7 +3,7 @@ import { $, toLocal, toast } from './util.js';
 import { api } from './api.js';
 import * as voice from './voice.js';
 import { addRem, startReminders, setServiceWorker } from './reminders.js';
-import { go, showApp } from './ui.js';
+import { view, setRole, openSettings } from './ui.js';
 import { send, isBusy } from './chat.js';
 import { initSettings } from './settings.js';
 
@@ -19,10 +19,15 @@ $('#q').addEventListener('keydown', e => {
 $('#q').addEventListener('input', e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(110, e.target.scrollHeight) + 'px'; });
 
 /* voz */
-$('#mic').onclick = () => { if (voice.toggle()) { go('chat'); showApp(); voice.listen(); } };
+$('#mic').onclick = () => { if (voice.toggle()) voice.listen(); };
 
-/* modos e lembretes */
-$('#roles').onclick = e => { const b = e.target.closest('button'); if (b) go(b.dataset.r); };
+/* ecrãs, modos e definições */
+$('#tabs').onclick = e => { const b = e.target.closest('button'); if (b) view(b.dataset.v); };
+$('#roles').onclick = e => { const b = e.target.closest('button'); if (b) setRole(b.dataset.r); };
+$('#cfgb').onclick = openSettings;
+$('#sx').onclick = () => $('#sd').close();
+
+/* lembretes */
 $('#rw').value = toLocal(new Date(Date.now() + 3600e3));
 $('#fa').onsubmit = async e => {
   e.preventDefault();
@@ -30,15 +35,17 @@ $('#fa').onsubmit = async e => {
 };
 
 /* avisos e PWA */
-try {
-  if (window.Notification && Notification.permission === 'default') {
-    const b = $('#nb'); b.hidden = false;
-    b.onclick = async () => { try { await Notification.requestPermission(); } catch (e) {} b.hidden = true; };
-  }
-} catch (e) {}
+const nb = $('#nb');
+const bell = () => nb.setAttribute('aria-pressed', !!window.Notification && Notification.permission === 'granted');
+bell();
+nb.onclick = async () => {
+  if (!window.Notification) { toast('Este browser não mostra avisos.'); return; }
+  if (Notification.permission === 'default') { try { await Notification.requestPermission(); } catch (e) {} bell(); }
+  toast(Notification.permission === 'granted' ? 'Avisos ligados.' : 'Avisos bloqueados. Permite-os nas definições do site.');
+};
 if ('serviceWorker' in navigator && isSecureContext) {
   navigator.serviceWorker.register('sw.js').then(setServiceWorker).catch(() => {});
 }
 initSettings();
-api('GET', '/api/ping').then(p => { if (!p.chat) toast('Ainda não há API configurada: abre Definições.'); }).catch(() => {});
+api('GET', '/api/ping').then(p => { if (!p.chat) toast('Ainda não há API configurada: abre Definições (roda dentada).'); }).catch(() => {});
 startReminders();

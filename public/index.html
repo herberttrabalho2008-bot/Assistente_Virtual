@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#030805">
+<meta name="theme-color" content="#050C09">
 <title>Camões</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -12,18 +12,48 @@
 </head>
 <body>
 <div id="toast" role="alert"></div>
-<div class="stage">
+<header class="top">
+<div class="brand"><span>C</span>amões</div>
+<span class="status" id="sy"></span>
+<button type="button" class="ib" id="nb" aria-pressed="false" aria-label="Avisos no ecrã"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></button>
+<button type="button" class="ib" id="cfgb" aria-label="Definições"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+<main class="app" id="app" data-view="home">
+<section class="panel" id="rp">
+<h2>Lembretes</h2>
+<form class="add" id="fa"><input type="text" id="rt" placeholder="O que queres recordar?" required aria-label="Lembrete"><div class="addrow"><input type="datetime-local" id="rw" required aria-label="Quando"><button>Adicionar</button></div></form>
+<div class="cards" id="list"></div>
+</section>
+<section class="center">
 <canvas id="orb" width="640" height="640" aria-hidden="true"></canvas>
+<p id="said"></p>
 <h1 id="hd">Como posso ajudar-te hoje?</h1>
-<div id="log" class="show" aria-live="polite"></div>
-<div id="rp">
-<form class="add" id="fa"><input type="text" id="rt" placeholder="O que queres recordar?" required aria-label="Lembrete"><input type="datetime-local" id="rw" required aria-label="Quando"><button>Adicionar</button></form>
-<div id="list"></div>
-<p class="note" id="sy"></p>
-<button class="alt" id="nb" hidden>Ativar avisos no ecrã</button>
+<p id="reply" aria-live="polite"></p>
+<button type="button" class="mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+</section>
+<section class="panel" id="cp">
+<h2>Conversa</h2>
+<div class="roles" id="roles">
+<button type="button" data-r="geral" aria-pressed="true">Geral</button>
+<button type="button" data-r="estudo" aria-pressed="false">Estudo</button>
+<button type="button" data-r="codigo" aria-pressed="false">Programação</button>
+<button type="button" data-r="criativo" aria-pressed="false">Criativo</button>
 </div>
+<div id="log" aria-live="polite"></div>
+<form class="row" id="f">
+<textarea id="q" rows="1" placeholder="Escreve aqui…" aria-label="Mensagem"></textarea>
+<button id="s">Enviar</button>
+</form>
+</section>
+</main>
+<nav class="tabs" id="tabs">
+<button type="button" data-v="home" aria-pressed="true" aria-label="Início"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg></button>
+<button type="button" data-v="chat" aria-pressed="false" aria-label="Conversa"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"/></svg></button>
+<button type="button" data-v="lem" aria-pressed="false" aria-label="Lembretes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></button>
+</nav>
+<dialog id="sd">
 <form id="sp" autocomplete="off">
-<h2>API do assistente</h2>
+<div class="dh"><h2>API do assistente</h2><button type="button" class="ib" id="sx" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
 <label>Fornecedor
 <select id="sprov"><option value="anthropic">Anthropic (Claude)</option><option value="openai">Compatível com OpenAI (OpenAI, NVIDIA, Ollama, LM Studio…)</option></select></label>
 <label id="surlrow" hidden>Endereço da API
@@ -36,22 +66,7 @@
 <div class="srow"><button class="alt" id="ssave">Guardar</button><button type="button" class="alt sec" id="stest">Testar</button><button type="button" class="alt sec" id="sclear" hidden>Apagar chave</button></div>
 <p class="note">A chave fica guardada só no servidor e nunca volta a ser mostrada.</p>
 </form>
-</div>
-<div class="dock">
-<div class="roles" id="roles">
-<button data-r="geral" aria-pressed="true">Geral</button>
-<button data-r="estudo" aria-pressed="false">Estudo</button>
-<button data-r="codigo" aria-pressed="false">Programação</button>
-<button data-r="criativo" aria-pressed="false">Criativo</button>
-<button data-r="lem" aria-pressed="false">Lembretes</button>
-<button data-r="cfg" aria-pressed="false">Definições</button>
-</div>
-<form class="row" id="f">
-<textarea id="q" rows="1" placeholder="Pergunta-me o que quiseres…" aria-label="Mensagem"></textarea>
-<button type="button" class="ib mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-<button class="ib" id="s" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg></button>
-</form>
-</div>
+</dialog>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

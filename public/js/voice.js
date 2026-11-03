@@ -31,7 +31,7 @@ export function listen() {
   try {
     rec = new SR(); rec.lang = 'pt-PT'; rec.interimResults = true; rec.continuous = false;
     let heard = '';
-    rec.onresult = e => { heard = ''; for (const r of e.results) heard += r[0].transcript; $('#q').value = heard; };
+    rec.onresult = e => { heard = ''; for (const r of e.results) heard += r[0].transcript; $('#q').value = heard; $('#said').textContent = heard; };
     rec.onerror = e => {
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
         on = false; updMic();

@@ -4,14 +4,13 @@ import { api } from './api.js';
 import { setState } from './orb.js';
 import { speak, listen, isOn } from './voice.js';
 import { loadRem } from './reminders.js';
-import { go, getRole, showApp } from './ui.js';
+import { getRole } from './ui.js';
 
 const hist = [];
 let busy = false;
 export const isBusy = () => busy;
 
 function bubble(cls, text) {
-  showApp();
   const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text;
   const l = $('#log'); l.append(d); l.scrollTop = l.scrollHeight; return d;
 }
@@ -28,9 +27,9 @@ function errText(e) {
 
 export async function send(text) {
   if (busy || !text.trim()) return;
-  go('chat');
   busy = true;
   bubble('u', text); hist.push({ role: 'user', content: text });
+  $('#said').textContent = text; $('#reply').textContent = '';
   const out = bubble('v', '…'); setState('think');
   let ok = false, reply = '';
   try {
@@ -39,10 +38,10 @@ export async function send(text) {
       messages: hist.slice(-16), role: getRole(), tzOffset: now.getTimezoneOffset(),
       now: now.toLocaleString('pt-PT', { dateStyle: 'full', timeStyle: 'short' }) + ' (hora local, ISO ' + toLocal(now) + ')',
     });
-    reply = r.text || '…'; out.textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
+    reply = r.text || '…'; out.textContent = reply; $('#reply').textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
     loadRem(); // o Camões pode ter criado ou apagado lembretes
   } catch (e) {
-    hist.pop(); out.textContent = errText(e);
+    hist.pop(); out.textContent = $('#reply').textContent = errText(e);
   }
   busy = false;
   if (ok && isOn()) speak(reply, () => { if (isOn()) listen(); else setState('idle'); });

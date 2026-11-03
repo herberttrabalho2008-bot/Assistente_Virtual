@@ -41,7 +41,7 @@ Deve aparecer `Camões a correr em http://localhost:3000`. Deixa essa janela abe
 ### 3. Escolher a API
 
 1. Abre http://localhost:3000 no browser.
-2. Clica em **Definições**.
+2. Clica na roda dentada (**Definições**), no canto de cima à direita.
 3. Escolhe o fornecedor e preenche:
    - **Anthropic (Claude):** cola a tua chave da API. O modelo já vem preenchido.
    - **Compatível com OpenAI:** endereço, modelo e chave. Para um modelo local com Ollama usa `http://localhost:11434/v1`, o nome do modelo (por exemplo `llama3`) e deixa a chave vazia.
@@ -54,7 +54,8 @@ A chave fica só no teu computador (`data/settings.json`, fora do Git) e nunca v
 - **Escrever:** abre a conversa e escreve a mensagem.
 - **Falar:** carrega no botão do microfone (precisa de Chrome ou Edge).
 - **Lembretes:** adiciona-os na lista, ou pede ao Camões, por exemplo "lembra-me de ligar à mãe às 19h".
-- **Modos:** muda entre Geral, Estudo, Programação e Criativo para mudar o estilo das respostas.
+- **Modos:** na Conversa, muda entre Geral, Estudo, Programação e Criativo para mudar o estilo das respostas.
+- **No telemóvel:** a barra de baixo troca entre a esfera, a Conversa e os Lembretes. No PC vês tudo ao mesmo tempo.
 
 Sem API configurada, os lembretes funcionam na mesma. Só a conversa fica desligada.
 

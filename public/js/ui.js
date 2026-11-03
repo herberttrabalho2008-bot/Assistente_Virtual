@@ -1,25 +1,22 @@
-// Estado da interface: modo ativo (papel/separador) e passagem do ecrã inicial para a conversa.
+// Estado da interface: modo de conversa, ecrã visível no telemóvel e janela de definições.
 import { $ } from './util.js';
-import { getState, setState } from './orb.js';
 import { loadRem } from './reminders.js';
 import { loadSettings } from './settings.js';
 
 let role = 'geral';
 export const getRole = () => role;
 
-export const showApp = () => document.body.classList.add('on');
-
-// r: um modo de conversa (geral, estudo, …), 'chat' (voltar à conversa), 'lem' ou 'cfg'.
-export function go(r) {
-  const panel = r === 'lem' || r === 'cfg' ? r : 'chat';
-  if (panel === 'chat' && r !== 'chat') role = r;
-  const pressed = panel === 'chat' ? role : panel;
-  document.querySelectorAll('#roles button').forEach(b => b.setAttribute('aria-pressed', b.dataset.r === pressed));
-  $('#log').classList.toggle('show', panel === 'chat');
-  $('#rp').classList.toggle('show', panel === 'lem');
-  $('#sp').classList.toggle('show', panel === 'cfg');
-  if (panel !== 'chat') showApp();
-  if (panel === 'lem') loadRem();
-  if (panel === 'cfg') loadSettings();
-  setState(getState());
+export function setRole(r) {
+  role = r;
+  document.querySelectorAll('#roles button').forEach(b => b.setAttribute('aria-pressed', b.dataset.r === r));
 }
+
+// v: 'home', 'chat' ou 'lem'. No PC as três colunas estão sempre visíveis.
+export function view(v) {
+  $('#app').dataset.view = v;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  if (v === 'lem') loadRem();
+  if (v === 'chat') { const l = $('#log'); l.scrollTop = l.scrollHeight; }
+}
+
+export function openSettings() { loadSettings(); $('#sd').showModal(); }

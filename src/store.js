@@ -17,7 +17,7 @@ function createStore(file) {
     add(text, when) {
       const d = new Date(when);
       if (!text || isNaN(d)) throw new Error('lembrete inválido');
-      const r = { id: 'r' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'), text: String(text).slice(0, 300), when: d.toISOString(), done: false };
+      const r = { id: 'r' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'), text: String(text).slice(0, 300), when: d.toISOString(), created: new Date().toISOString(), done: false };
       const list = read(); list.push(r); write(list);
       return r;
     },
