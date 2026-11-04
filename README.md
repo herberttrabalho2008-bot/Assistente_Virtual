@@ -54,7 +54,7 @@ A chave fica só no teu computador (`data/settings.json`, fora do Git) e nunca v
 - **Escrever:** abre a conversa e escreve a mensagem.
 - **Falar:** carrega no botão do microfone (precisa de Chrome ou Edge).
 - **Lembretes:** adiciona-os na lista, ou pede ao Camões, por exemplo "lembra-me de ligar à mãe às 19h".
-- **Modos:** na Conversa, muda entre Geral, Estudo, Programação e Criativo para mudar o estilo das respostas.
+- **Modo e cor:** nas Definições escolhes o modo (Geral, Estudo, Programação ou Criativo), que muda o estilo das respostas, e a cor do Camões (verde, azul ou vermelho). Ficam guardados só nesse dispositivo.
 - **No telemóvel:** a barra de baixo troca entre a esfera, a Conversa e os Lembretes. No PC vês tudo ao mesmo tempo.
 
 Sem API configurada, os lembretes funcionam na mesma. Só a conversa fica desligada.
@@ -132,7 +132,7 @@ src/
 public/              a app (sem build: módulos ES nativos)
   index.html, sw.js, manifest.webmanifest, ícones
   css/style.css
-  js/                main, chat, voice, reminders, orb, settings, ui, api, util
+  js/                main, chat, voice, reminders, orb, theme, settings, ui, api, util
 test/                testes do servidor
 tools/make-icons.js  desenha a logo e gera os ícones
 imagens/             logo (logo.png, gerada por npm run icons) e imagens do ecrã

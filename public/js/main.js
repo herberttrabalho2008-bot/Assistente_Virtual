@@ -3,7 +3,8 @@ import { $, toLocal, toast } from './util.js';
 import { api } from './api.js';
 import * as voice from './voice.js';
 import { addRem, startReminders, setServiceWorker } from './reminders.js';
-import { view, setRole, openSettings } from './ui.js';
+import { view, setRole, getRole, openSettings } from './ui.js';
+import { setTheme, getTheme } from './theme.js';
 import { send, isBusy } from './chat.js';
 import { initSettings } from './settings.js';
 
@@ -23,7 +24,11 @@ $('#mic').onclick = () => { if (voice.toggle()) voice.listen(); };
 
 /* ecrãs, modos e definições */
 $('#tabs').onclick = e => { const b = e.target.closest('button'); if (b) view(b.dataset.v); };
-$('#roles').onclick = e => { const b = e.target.closest('button'); if (b) setRole(b.dataset.r); };
+$('#srole').onchange = e => setRole(e.target.value);
+setRole(getRole());
+const marcaCor = () => document.querySelectorAll('#scor button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === getTheme()));
+$('#scor').onclick = e => { const b = e.target.closest('button'); if (b) { setTheme(b.dataset.c); marcaCor(); } };
+setTheme(getTheme()); marcaCor();
 $('#cfgb').onclick = openSettings;
 $('#sx').onclick = () => $('#sd').close();
 

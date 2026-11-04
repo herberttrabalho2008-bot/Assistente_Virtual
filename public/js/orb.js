@@ -1,5 +1,6 @@
 // Esfera animada (núcleo, órbitas, estrelas e anéis) e texto de estado.
 import { $ } from './util.js';
+import { palette } from './theme.js';
 
 const HEAD = 'Como posso ajudar-te hoje?';
 const cv = $('#orb'), cx = cv.getContext('2d'), W = 640, C = W / 2, R = W * .36;
@@ -19,12 +20,12 @@ export function setState(s) {
 }
 
 function arc(r, from, span, width, alpha) {
-  cx.strokeStyle = `rgba(34,229,139,${alpha})`; cx.lineWidth = width;
+  cx.strokeStyle = `rgba(${palette().rgb},${alpha})`; cx.lineWidth = width;
   cx.beginPath(); cx.arc(C, C, r, from, from + span); cx.stroke();
 }
 
 function orbit(rot, from, span, width) {
-  cx.strokeStyle = '#3CF59A'; cx.lineWidth = width;
+  cx.strokeStyle = palette().orbit; cx.lineWidth = width;
   cx.beginPath(); cx.ellipse(C, C, R * .6, R * .25, rot, from, from + span); cx.stroke();
 }
 
@@ -35,22 +36,23 @@ function frame(t) {
   const k = t / 1000;
   const tgt = state === 'listen' ? .08 + .08 * Math.sin(k * 7) : state === 'speak' ? .2 * (.4 + .6 * Math.abs(Math.sin(k * 9) * Math.sin(k * 4.1))) + kick : .04 * Math.sin(k * 1.6);
   pulse += (tgt - pulse) * .2; kick *= .92;
+  const P = palette();
   cx.clearRect(0, 0, W, W);
 
   // brilho à volta e corpo da esfera
   let g = cx.createRadialGradient(C, C, R * .85, C, C, R * 1.38);
-  g.addColorStop(0, 'rgba(34,229,139,.12)'); g.addColorStop(1, 'rgba(34,229,139,0)');
+  g.addColorStop(0, `rgba(${P.rgb},.12)`); g.addColorStop(1, `rgba(${P.rgb},0)`);
   cx.fillStyle = g; cx.fillRect(0, 0, W, W);
   g = cx.createRadialGradient(C, C, 0, C, C, R);
-  g.addColorStop(0, '#0E4A2E'); g.addColorStop(.55, '#062418'); g.addColorStop(1, '#03130C');
+  g.addColorStop(0, P.body[0]); g.addColorStop(.55, P.body[1]); g.addColorStop(1, P.body[2]);
   cx.fillStyle = g; cx.beginPath(); cx.arc(C, C, R, 0, 7); cx.fill();
 
   // raios e estrelas, a rodar devagar
   cx.save(); cx.beginPath(); cx.arc(C, C, R, 0, 7); cx.clip();
-  cx.strokeStyle = 'rgba(120,255,190,.05)'; cx.lineWidth = 1;
+  cx.strokeStyle = `rgba(${P.ray},.05)`; cx.lineWidth = 1;
   for (const a of RAYS) { cx.beginPath(); cx.moveTo(C, C); cx.lineTo(C + Math.cos(a + ph * .03) * R, C + Math.sin(a + ph * .03) * R); cx.stroke(); }
   for (const [r, a, s, f] of STARS) {
-    cx.fillStyle = `rgba(170,255,210,${.2 + .5 * Math.abs(Math.sin(k * 1.3 + f))})`;
+    cx.fillStyle = `rgba(${P.star},${.2 + .5 * Math.abs(Math.sin(k * 1.3 + f))})`;
     cx.fillRect(C + Math.cos(a + ph * .05) * r, C + Math.sin(a + ph * .05) * r, s, s);
   }
   cx.restore();
@@ -66,14 +68,14 @@ function frame(t) {
   // núcleo
   const rc = R * .2 * (1 + pulse);
   g = cx.createRadialGradient(C, C, 0, C, C, rc * 2.2);
-  g.addColorStop(0, 'rgba(140,255,200,.55)'); g.addColorStop(1, 'rgba(34,229,139,0)');
+  g.addColorStop(0, `rgba(${P.halo},.55)`); g.addColorStop(1, `rgba(${P.rgb},0)`);
   cx.fillStyle = g; cx.beginPath(); cx.arc(C, C, rc * 2.2, 0, 7); cx.fill();
   g = cx.createRadialGradient(C - rc * .15, C - rc * .15, 0, C, C, rc);
-  g.addColorStop(0, '#FFFFFF'); g.addColorStop(.3, '#DDFFEC'); g.addColorStop(.6, '#7FE8B0'); g.addColorStop(1, '#2A9E66');
+  g.addColorStop(0, '#FFFFFF'); g.addColorStop(.3, P.core[0]); g.addColorStop(.6, P.core[1]); g.addColorStop(1, P.core[2]);
   cx.fillStyle = g; cx.beginPath(); cx.arc(C, C, rc, 0, 7); cx.fill();
 
   // órbitas brilhantes
-  cx.shadowColor = 'rgba(34,229,139,.9)'; cx.shadowBlur = 24;
+  cx.shadowColor = `rgba(${P.rgb},.9)`; cx.shadowBlur = 24;
   orbit(-.55 + Math.sin(k * .3) * .05, ph, Math.PI * 1.45, R * .05 * (1 + pulse));
   orbit(.95, -ph * .8 + 1, Math.PI * 1.05, R * .04 * (1 + pulse));
   cx.shadowBlur = 0;

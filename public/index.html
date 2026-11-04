@@ -9,6 +9,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="stylesheet" href="css/style.css">
+<script>try{var c=localStorage.getItem('camoes_cor');if(c==='azul'||c==='vermelho')document.documentElement.dataset.theme=c}catch(e){}</script>
 </head>
 <body>
 <div id="toast" role="alert"></div>
@@ -32,13 +33,7 @@
 <button type="button" class="mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
 </section>
 <section class="panel" id="cp">
-<h2>Conversa</h2>
-<div class="roles" id="roles">
-<button type="button" data-r="geral" aria-pressed="true">Geral</button>
-<button type="button" data-r="estudo" aria-pressed="false">Estudo</button>
-<button type="button" data-r="codigo" aria-pressed="false">Programação</button>
-<button type="button" data-r="criativo" aria-pressed="false">Criativo</button>
-</div>
+<h2>Conversa <span class="mode" id="mode">Geral</span></h2>
 <div id="log" aria-live="polite"></div>
 <form class="row" id="f">
 <textarea id="q" rows="1" placeholder="Escreve aqui…" aria-label="Mensagem"></textarea>
@@ -52,8 +47,21 @@
 <button type="button" data-v="lem" aria-pressed="false" aria-label="Lembretes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></button>
 </nav>
 <dialog id="sd">
+<div class="dh"><h2>Definições</h2><button type="button" class="ib" id="sx" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<div class="sgroup">
+<h3>Modo e cor</h3>
+<label>Modo de conversa
+<select id="srole"><option value="geral">Geral</option><option value="estudo">Estudo</option><option value="codigo">Programação</option><option value="criativo">Criativo</option></select></label>
+<div class="lbl" id="scorl">Cor do Camões</div>
+<div class="colors" id="scor" role="group" aria-labelledby="scorl">
+<button type="button" data-c="verde" aria-pressed="false"><i></i>Verde</button>
+<button type="button" data-c="azul" aria-pressed="false"><i></i>Azul</button>
+<button type="button" data-c="vermelho" aria-pressed="false"><i></i>Vermelho</button>
+</div>
+<p class="note">O modo e a cor ficam guardados só neste dispositivo.</p>
+</div>
 <form id="sp" autocomplete="off">
-<div class="dh"><h2>API do assistente</h2><button type="button" class="ib" id="sx" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<h3>API do assistente</h3>
 <label>Fornecedor
 <select id="sprov"><option value="anthropic">Anthropic (Claude)</option><option value="openai">Compatível com OpenAI (OpenAI, NVIDIA, Ollama, LM Studio…)</option></select></label>
 <label id="surlrow" hidden>Endereço da API
