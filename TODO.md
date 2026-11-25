@@ -22,7 +22,7 @@ Estado a 2026-11-25. Ordenadas por prioridade dentro de cada secção.
 - [ ] Guardar o histórico da conversa (hoje só existe em memória e perde-se ao recarregar a página).
 - [x] Respostas em *streaming* (feito: o texto aparece à medida que é escrito, e a voz fala por frases).
 - [ ] Verificar a voz por frases num browser com microfone e voz pt-PT (escrita mas não ouvida).
-- [ ] Imagens do README (`imagens/ecra-pc.png` e `ecra-telemovel.png`) ainda mostram a esfera antiga: voltar a tirá-las com o globo.
+- [x] Imagens do README (`imagens/ecra-pc.png` e `ecra-telemovel.png`) atualizadas com o globo.
 - [ ] Lembretes: editar, repetir (diário, semanal) e adiar.
 - [ ] Controlar o PC: módulo local com uma lista curta de ações permitidas e confirmação antes de executar. Só depois de rever a segurança.
 - [ ] Mostrar na página de Definições a lista de modelos disponíveis, em vez de só sugestões.

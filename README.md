@@ -15,7 +15,7 @@ Assistente virtual pessoal em português de Portugal, inspirado no JARVIS. Corre
 | --- | --- |
 | ![Camões no PC](imagens/ecra-pc.png) | ![Camões no telemóvel](imagens/ecra-telemovel.png) |
 
-> As imagens acima mostram a versão anterior (esfera). O globo novo está descrito em [Novidades](#novidades) e em [Personalizar o globo](#personalizar-o-globo).
+O globo e tudo o que mudou está descrito em [Novidades](#novidades) e em [Personalizar o globo](#personalizar-o-globo).
 
 ## Novidades
 
