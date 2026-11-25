@@ -102,11 +102,24 @@ function createServer({ config, store, assistant, settings }) {
       if (limited(req.socket.remoteAddress)) return send(res, 429, { error: 'rate' });
       const b = await readJson(req);
       if (!Array.isArray(b.messages)) return send(res, 400, { error: 'pedido' });
+      const args = { messages: b.messages, role: b.role, now: String(b.now || new Date().toISOString()).slice(0, 200), tzOffset: b.tzOffset };
+      // Com stream:true responde em linhas JSON ({"t":"texto"} ... {"done":true}); erros antes do
+      // primeiro byte continuam a ser respostas normais com o estado HTTP certo.
+      let streaming = false;
+      const line = o => {
+        if (!streaming) { streaming = true; res.writeHead(200, { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store', 'x-accel-buffering': 'no' }); }
+        res.write(JSON.stringify(o) + '\n');
+      };
       try {
-        const text = await assistant.chat({ messages: b.messages, role: b.role, now: String(b.now || new Date().toISOString()).slice(0, 200), tzOffset: b.tzOffset });
-        return send(res, 200, { text });
+        if (!b.stream) return send(res, 200, { text: await assistant.chat(args) });
+        let any = false;
+        const text = await assistant.chat({ ...args, onText: t => { any = true; line({ t }); } });
+        if (!any && text) line({ t: text });
+        line({ done: true }); return res.end();
       } catch (e) {
-        return send(res, e.status === 429 ? 429 : 502, { error: modelError(e), status: e.status, detail: e.detail });
+        const err = { error: modelError(e), status: e.status, detail: e.detail };
+        if (!streaming) return send(res, e.status === 429 ? 429 : 502, err);
+        line(err); return res.end();
       }
     }
     send(res, 404, { error: 'nao encontrado' });

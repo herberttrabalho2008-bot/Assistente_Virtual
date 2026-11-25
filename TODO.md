@@ -1,6 +1,6 @@
 # Tarefas por fazer
 
-Estado a 2026-11-02. Ordenadas por prioridade dentro de cada secção.
+Estado a 2026-11-25. Ordenadas por prioridade dentro de cada secção.
 
 ## Verificar (código escrito, nunca testado a sério)
 
@@ -20,7 +20,9 @@ Estado a 2026-11-02. Ordenadas por prioridade dentro de cada secção.
 
 - [ ] Avisos de lembretes com a app fechada (Web Push: chaves VAPID, subscrição guardada no servidor).
 - [ ] Guardar o histórico da conversa (hoje só existe em memória e perde-se ao recarregar a página).
-- [ ] Respostas em *streaming* (hoje a resposta aparece toda de uma vez).
+- [x] Respostas em *streaming* (feito: o texto aparece à medida que é escrito, e a voz fala por frases).
+- [ ] Verificar a voz por frases num browser com microfone e voz pt-PT (escrita mas não ouvida).
+- [ ] Imagens do README (`imagens/ecra-pc.png` e `ecra-telemovel.png`) ainda mostram a esfera antiga: voltar a tirá-las com o globo.
 - [ ] Lembretes: editar, repetir (diário, semanal) e adiar.
 - [ ] Controlar o PC: módulo local com uma lista curta de ações permitidas e confirmação antes de executar. Só depois de rever a segurança.
 - [ ] Mostrar na página de Definições a lista de modelos disponíveis, em vez de só sugestões.

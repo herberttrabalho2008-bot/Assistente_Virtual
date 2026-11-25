@@ -5,8 +5,9 @@ import * as voice from './voice.js';
 import { addRem, startReminders, setServiceWorker } from './reminders.js';
 import { view, setRole, getRole, openSettings } from './ui.js';
 import { setTheme, getTheme } from './theme.js';
-import { send, isBusy } from './chat.js';
+import { send, isBusy, clearChat } from './chat.js';
 import { initSettings } from './settings.js';
+import { initGlobeUI } from './globeui.js';
 
 voice.hooks.onUtterance = send;
 voice.hooks.isBusy = isBusy;
@@ -18,6 +19,18 @@ $('#q').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); $('#f').requestSubmit(); }
 });
 $('#q').addEventListener('input', e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(110, e.target.scrollHeight) + 'px'; });
+
+/* limpar a conversa: toca duas vezes (a primeira só arma o botão, para não apagar sem querer) */
+$('#clr').onclick = () => {
+  const b = $('#clr');
+  if (!$('#log').children.length) { toast('A conversa já está vazia.'); return; }
+  if (isBusy()) { toast('Espera que o Camões acabe de responder.'); return; }
+  if (!b.classList.contains('arm')) {
+    b.classList.add('arm'); toast('Toca outra vez para limpar a conversa.');
+    setTimeout(() => b.classList.remove('arm'), 3000); return;
+  }
+  b.classList.remove('arm'); clearChat(); toast('Conversa limpa.');
+};
 
 /* voz */
 $('#mic').onclick = () => { if (voice.toggle()) voice.listen(); };
@@ -52,5 +65,6 @@ if ('serviceWorker' in navigator && isSecureContext) {
   navigator.serviceWorker.register('sw.js').then(setServiceWorker).catch(() => {});
 }
 initSettings();
+initGlobeUI();
 api('GET', '/api/ping').then(p => { if (!p.chat) toast('Ainda não há API configurada: abre Definições (roda dentada).'); }).catch(() => {});
 startReminders();

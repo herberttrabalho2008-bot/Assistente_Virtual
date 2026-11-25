@@ -4,15 +4,42 @@
 
 Assistente virtual pessoal em português de Portugal, inspirado no JARVIS. Corre no teu PC e usas no PC e no telemóvel (como app instalável).
 
-- Conversa por texto e por voz, com uma esfera animada.
+- Conversa por texto e por voz, com um globo terrestre futurista e personalizável.
+- As respostas aparecem à medida que são escritas (streaming), com um contador de segundos.
 - Quatro modos: Geral, Estudo, Programação e Criativo.
 - Lembretes guardados no servidor, iguais em todos os dispositivos.
-- Funciona com Claude (Anthropic), OpenAI ou modelos locais (Ollama, LM Studio).
+- Funciona com Claude (Anthropic), OpenAI, a API da NVIDIA ou modelos locais (Ollama, LM Studio).
 - Sem dependências: só precisas do Node.js.
 
 | PC | Telemóvel |
 | --- | --- |
 | ![Camões no PC](imagens/ecra-pc.png) | ![Camões no telemóvel](imagens/ecra-telemovel.png) |
+
+> As imagens acima mostram a versão anterior (esfera). O globo novo está descrito em [Novidades](#novidades) e em [Personalizar o globo](#personalizar-o-globo).
+
+## Novidades
+
+### Globo futurista
+- A esfera deu lugar a um **globo terrestre** que roda, com a Terra inclinada, grelha de latitudes e longitudes e continentes feitos de pontos.
+- **Ligações de dados:** arcos luminosos partem da tua cidade (Lisboa por omissão) para outras seis, com pacotes de dados a viajar.
+- **Efeitos de painel de comando:** radar a varrer, linhas de scan holográficas, anel de marcas, dois cometas, um satélite em órbita, cantos de mira e leituras de texto nos cantos (estado do assistente e hora UTC).
+- **Duas cores por tema:** além da cor principal (verde, azul ou vermelho) há uma cor de contraste e uma atmosfera noutro tom (por exemplo âmbar sobre o azul).
+- O globo reage aos estados do assistente: roda mais depressa ao pensar e pulsa ao falar.
+
+### Respostas mais rápidas
+- **Streaming:** o texto aparece à medida que o modelo o escreve, tanto na Anthropic como nas APIs compatíveis com OpenAI.
+- **Voz por frases:** em modo de voz, o Camões começa a falar logo que a primeira frase está completa.
+- **Menos pedidos falhados:** se um modelo recusar ferramentas, o servidor lembra-se e deixa de as enviar, em vez de repetir o pedido em cada mensagem.
+- **Contador de segundos** em cada resposta, no ecrã principal e no chat.
+- **Mensagem clara** quando o modelo devolve uma resposta vazia, em vez de mostrar só "…".
+- O modelo por omissão para contas gratuitas da NVIDIA é o `nvidia/nemotron-3.5-lightning-30b-a3b`, muito mais rápido do que modelos gigantes como o `mistral-large-4-1t`.
+
+### Conversa
+- **Botão de limpar a conversa** (ícone de lixo): toca duas vezes para apagar o histórico, os balões e o texto do ecrã principal.
+
+### Definições redesenhadas
+- Cartões por secção (Modo e cor, Globo, API), com ícones, interruptores, slider, seletor de cor redondo e botões novos.
+- Animação ao abrir, fundo desfocado e cabeçalho fixo; funciona bem no PC e no telemóvel.
 
 ## Guião rápido
 
@@ -51,13 +78,32 @@ A chave fica só no teu computador (`data/settings.json`, fora do Git) e nunca v
 
 ### 4. Usar
 
-- **Escrever:** abre a conversa e escreve a mensagem.
-- **Falar:** carrega no botão do microfone (precisa de Chrome ou Edge).
+- **Escrever:** abre a conversa e escreve a mensagem. A resposta aparece aos poucos, com o tempo que demorou.
+- **Limpar a conversa:** toca duas vezes no ícone de lixo, no topo da Conversa.
+- **Falar:** carrega no botão do microfone (precisa de Chrome ou Edge). O Camões começa a responder logo na primeira frase.
 - **Lembretes:** adiciona-os na lista, ou pede ao Camões, por exemplo "lembra-me de ligar à mãe às 19h".
 - **Modo e cor:** nas Definições escolhes o modo (Geral, Estudo, Programação ou Criativo), que muda o estilo das respostas, e a cor do Camões (verde, azul ou vermelho). Ficam guardados só nesse dispositivo.
 - **No telemóvel:** a barra de baixo troca entre a esfera, a Conversa e os Lembretes. No PC vês tudo ao mesmo tempo.
 
 Sem API configurada, os lembretes funcionam na mesma. Só a conversa fica desligada.
+
+## Personalizar o globo
+
+Em **Definições**, na secção **Globo**, tudo se aplica ao vivo:
+
+| Opção | O que faz |
+| --- | --- |
+| A tua cidade | Escolhe entre 16 cidades (Lisboa, Porto, Funchal, Praia, Luanda, Maputo, São Paulo, Rio, Londres, Paris, Madrid, Nova Iorque, Dubai, Joanesburgo, Tóquio, Sydney). Fica marcada no globo e as ligações partem dela. |
+| Velocidade de rotação | De 0× (parado) a 3×. |
+| Cor de contraste | Seletor de cor livre para as ligações, o marcador, um cometa e o satélite. "Automática" volta à cor do tema. |
+| Interruptores | Ligações de dados, marcar a minha cidade, radar e linhas de scan, anéis/cometas/satélite e textos nos cantos. |
+| Repor o globo | Volta a todas as predefinições. |
+
+As escolhas ficam guardadas só no dispositivo (no PC e no telemóvel são independentes).
+
+### Escolher um modelo rápido
+
+A velocidade depende sobretudo do modelo. Modelos gigantes (centenas de milhares de milhões de parâmetros) podem demorar dezenas de segundos só a começar, sobretudo em contas gratuitas. Para conversa normal, um modelo leve responde em poucos segundos. Se ficar fraco para perguntas difíceis, volta a um maior nas Definições. O contador de segundos mostra o tempo real de cada resposta.
 
 ## Usar no telemóvel
 
@@ -108,7 +154,9 @@ Tudo se pode fazer em **Definições**. Se preferires ficheiro, copia `.env.exam
 - Os avisos de lembretes só aparecem com a app aberta. Com a app fechada seria preciso Web Push, que ainda não está feito.
 - A voz usa o reconhecimento do browser. No Chrome, o áudio vai para a Google.
 - O Camões não controla o PC.
-- O histórico da conversa perde-se quando recarregas a página.
+- O histórico da conversa perde-se quando recarregas a página (ou quando a limpas).
+- Os continentes do globo são contornos aproximados, feitos à mão.
+- Em modelos que não aceitam ferramentas (alguns da NVIDIA e locais), a conversa funciona mas o Camões não cria lembretes por ti.
 - O servidor limita a 20 mensagens por minuto por IP, mas isso não substitui um limite de gastos na conta da API.
 
 A lista do que falta fazer está em [TODO.md](TODO.md).
@@ -132,8 +180,9 @@ src/
 public/              a app (sem build: módulos ES nativos)
   index.html, sw.js, manifest.webmanifest, ícones
   css/style.css
-  js/                main, chat, voice, reminders, orb, theme, settings, ui, api, util
-test/                testes do servidor
+  js/                main, chat, voice, reminders, orb (o globo), globeui (opções do globo),
+                     theme, settings, ui, api, util
+test/                testes do servidor (http, settings, store e streaming)
 tools/make-icons.js  desenha a logo e gera os ícones
 imagens/             logo (logo.png, gerada por npm run icons) e imagens do ecrã
 legacy/              protótipos originais (só funcionavam dentro do claude.ai)

@@ -11,18 +11,39 @@ let on = false, rec = null;
 export const isOn = () => on;
 const updMic = () => $('#mic').setAttribute('aria-pressed', on);
 
-export function speak(t, done) {
-  if (!window.speechSynthesis) { done(); return; }
+// Fala por frases: push(texto) vai recebendo o texto à medida que chega e fala cada frase assim
+// que está completa; end() fala o resto e chama done() quando acabar. abort() corta tudo em silêncio.
+export function speaker(done) {
+  if (!window.speechSynthesis) return { push() {}, end: done, abort() {} };
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(t.replace(/[*_`#>]/g, ''));
-  u.lang = 'pt-PT'; u.rate = 1;
-  const vs = speechSynthesis.getVoices().filter(v => /^pt[-_]PT/i.test(v.lang));
-  const v = vs.find(x => /duarte|joaquim|diogo|pedro|cristiano/i.test(x.name)) || vs[0];
-  if (v) u.voice = v;
-  u.onstart = () => setState('speak'); u.onboundary = () => pulseKick(.09);
-  let fin = false; const end = () => { if (!fin) { fin = true; done(); } };
-  u.onend = end; u.onerror = end;
-  setState('speak'); speechSynthesis.speak(u);
+  let buf = '', pending = 0, ended = false, fin = false;
+  const check = () => { if (ended && !pending && !fin) { fin = true; done(); } };
+  const say = raw => {
+    const t = raw.replace(/[*_`#>]/g, '').trim();
+    if (!t) return;
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'pt-PT'; u.rate = 1;
+    const vs = speechSynthesis.getVoices().filter(v => /^pt[-_]PT/i.test(v.lang));
+    const v = vs.find(x => /duarte|joaquim|diogo|pedro|cristiano/i.test(x.name)) || vs[0];
+    if (v) u.voice = v;
+    u.onstart = () => setState('speak'); u.onboundary = () => pulseKick(.09);
+    u.onend = u.onerror = () => { pending--; check(); };
+    pending++; speechSynthesis.speak(u);
+  };
+  return {
+    push(s) {
+      buf += s;
+      let m; // frase completa = pelo menos 12 caracteres até . ! ? … seguido de espaço, ou uma linha inteira
+      while ((m = /^(?:([\s\S]{12,}?[.!?…])\s|([^\n]*)\n)/.exec(buf))) { say(m[1] !== undefined ? m[1] : m[2]); buf = buf.slice(m[0].length); }
+    },
+    end() { say(buf); buf = ''; ended = true; check(); },
+    abort() { fin = true; buf = ''; speechSynthesis.cancel(); },
+  };
+}
+
+export function speak(t, done) {
+  const s = speaker(done);
+  s.push(t); s.end();
 }
 
 export function listen() {

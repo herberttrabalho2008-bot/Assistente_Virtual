@@ -1,14 +1,24 @@
 // Conversa com o Camões.
 import { $, toLocal } from './util.js';
-import { api } from './api.js';
+import { apiStream } from './api.js';
 import { setState } from './orb.js';
-import { speak, listen, isOn } from './voice.js';
+import { speaker, listen, isOn } from './voice.js';
 import { loadRem } from './reminders.js';
 import { getRole } from './ui.js';
 
 const hist = [];
 let busy = false;
 export const isBusy = () => busy;
+
+// Apaga a conversa (histórico, balões e o texto do ecrã principal). Não faz nada a meio de uma resposta.
+export function clearChat() {
+  if (busy) return false;
+  hist.length = 0;
+  $('#log').replaceChildren();
+  $('#said').textContent = $('#reply').textContent = $('#tmr').textContent = '';
+  try { speechSynthesis.cancel(); } catch (e) {}
+  return true;
+}
 
 function bubble(cls, text) {
   const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text;
@@ -30,20 +40,34 @@ export async function send(text) {
   busy = true;
   bubble('u', text); hist.push({ role: 'user', content: text });
   $('#said').textContent = text; $('#reply').textContent = '';
-  const out = bubble('v', '…'); setState('think');
+  const out = bubble('v', ''), body = document.createElement('span'), tm = document.createElement('div');
+  tm.className = 'tm'; body.textContent = '…'; out.append(body, tm);
+  // contador de segundos: corre enquanto o Camões responde e fica com o tempo total no fim
+  const t0 = performance.now();
+  const tick = () => { $('#tmr').textContent = tm.textContent = '⏱ ' + ((performance.now() - t0) / 1000).toFixed(1) + ' s'; };
+  tick(); const timer = setInterval(tick, 100);
+  setState('think');
   let ok = false, reply = '';
+  // Em modo de voz, o Camões começa a falar na primeira frase, sem esperar pelo fim da resposta.
+  const spk = isOn() ? speaker(() => { if (isOn()) listen(); else setState('idle'); }) : null;
   try {
     const now = new Date();
-    const r = await api('POST', '/api/chat', {
+    await apiStream('/api/chat', {
       messages: hist.slice(-16), role: getRole(), tzOffset: now.getTimezoneOffset(),
       now: now.toLocaleString('pt-PT', { dateStyle: 'full', timeStyle: 'short' }) + ' (hora local, ISO ' + toLocal(now) + ')',
+    }, t => {
+      reply += t; body.textContent = $('#reply').textContent = reply;
+      const l = $('#log'); l.scrollTop = l.scrollHeight;
+      if (spk) spk.push(t);
     });
-    reply = r.text || '…'; out.textContent = reply; $('#reply').textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
+    if (!reply.trim()) throw Object.assign(new Error('vazio'), { status: 502, detail: 'resposta vazia, o modelo demorou demasiado ou falhou' });
+    reply = reply.trim(); body.textContent = $('#reply').textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
     loadRem(); // o Camões pode ter criado ou apagado lembretes
   } catch (e) {
-    hist.pop(); out.textContent = $('#reply').textContent = errText(e);
+    if (spk) spk.abort();
+    hist.pop(); body.textContent = $('#reply').textContent = errText(e);
   }
-  busy = false;
-  if (ok && isOn()) speak(reply, () => { if (isOn()) listen(); else setState('idle'); });
+  clearInterval(timer); tick(); busy = false;
+  if (ok && spk) spk.end();
   else if (isOn()) listen(); else setState('idle');
 }

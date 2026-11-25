@@ -30,10 +30,12 @@
 <p id="said"></p>
 <h1 id="hd">Como posso ajudar-te hoje?</h1>
 <p id="reply" aria-live="polite"></p>
+<p id="tmr" class="tm" aria-hidden="true"></p>
 <button type="button" class="mic" id="mic" aria-pressed="false" aria-label="Conversa por voz"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
 </section>
 <section class="panel" id="cp">
-<h2>Conversa <span class="mode" id="mode">Geral</span></h2>
+<div class="ph"><h2>Conversa <span class="mode" id="mode">Geral</span></h2>
+<button type="button" class="ib" id="clr" aria-label="Limpar conversa" title="Limpar conversa"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div>
 <div id="log" aria-live="polite"></div>
 <form class="row" id="f">
 <textarea id="q" rows="1" placeholder="Escreve aqui…" aria-label="Mensagem"></textarea>
@@ -48,8 +50,9 @@
 </nav>
 <dialog id="sd">
 <div class="dh"><h2>Definições</h2><button type="button" class="ib" id="sx" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-<div class="sgroup">
-<h3>Modo e cor</h3>
+<div class="dbody">
+<section class="sgroup">
+<h3><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.3-1.6-.4-1 .2-2 1.3-2H17a4 4 0 0 0 4-4c0-5-4-10.4-9-10.4z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>Modo e cor</h3>
 <label>Modo de conversa
 <select id="srole"><option value="geral">Geral</option><option value="estudo">Estudo</option><option value="codigo">Programação</option><option value="criativo">Criativo</option></select></label>
 <div class="lbl" id="scorl">Cor do Camões</div>
@@ -59,9 +62,29 @@
 <button type="button" data-c="vermelho" aria-pressed="false"><i></i>Vermelho</button>
 </div>
 <p class="note">O modo e a cor ficam guardados só neste dispositivo.</p>
+</section>
+<section class="sgroup" id="sg">
+<h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9S14.5 18.3 12 21c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>Globo</h3>
+<label>A tua cidade (marcada no globo)
+<select id="gcity"></select></label>
+<label class="rng"><span class="lrow"><span>Velocidade de rotação</span><output id="gspeedv">1×</output></span>
+<input type="range" id="gspeed" min="0" max="3" step="0.1"></label>
+<div class="lbl" id="gaccl">Cor de contraste (ligações, marcador, cometa)</div>
+<div class="accrow" role="group" aria-labelledby="gaccl">
+<input type="color" id="gacc" aria-label="Escolher cor de contraste"><button type="button" id="gaccx" class="mini">Automática (do tema)</button>
 </div>
+<div class="tgls">
+<label class="tog"><input type="checkbox" id="g-links"> Ligações de dados</label>
+<label class="tog"><input type="checkbox" id="g-home"> Marcar a minha cidade</label>
+<label class="tog"><input type="checkbox" id="g-radar"> Radar e linhas de scan</label>
+<label class="tog"><input type="checkbox" id="g-rings"> Anéis, cometas e satélite</label>
+<label class="tog"><input type="checkbox" id="g-hud"> Textos nos cantos</label>
+</div>
+<button type="button" id="gres" class="mini">Repor o globo</button>
+<p class="note">As escolhas do globo ficam guardadas só neste dispositivo.</p>
+</section>
 <form id="sp" autocomplete="off">
-<h3>API do assistente</h3>
+<h3><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>API do assistente</h3>
 <label>Fornecedor
 <select id="sprov"><option value="anthropic">Anthropic (Claude)</option><option value="openai">Compatível com OpenAI (OpenAI, NVIDIA, Ollama, LM Studio…)</option></select></label>
 <label id="surlrow" hidden>Endereço da API
@@ -74,6 +97,7 @@
 <div class="srow"><button class="alt" id="ssave">Guardar</button><button type="button" class="alt sec" id="stest">Testar</button><button type="button" class="alt sec" id="sclear" hidden>Apagar chave</button></div>
 <p class="note">A chave fica guardada só no servidor e nunca volta a ser mostrada.</p>
 </form>
+</div>
 </dialog>
 <script type="module" src="js/main.js"></script>
 </body>
