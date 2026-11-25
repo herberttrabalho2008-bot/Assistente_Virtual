@@ -51,7 +51,15 @@ function inside(lo, la, poly) {
   }
   return c;
 }
-const D = Math.PI / 180, TILT = 23 * D, ST = 2.6, RING = -.35;
+const D = Math.PI / 180, TILT0 = 23 * D, ST = 2.6, RING = -.35;
+
+// Vista controlada com o rato ou os dedos: rodar (arrastar), zoom (roda / pinça), mover (Shift + arrastar).
+// Os campos "T" são o alvo para onde a vista desliza; "vel" é a inércia da rotação depois de largar.
+const view = { rot: 0, vel: 0, tilt: TILT0, tiltT: TILT0, zoom: 1, zoomT: 1, px: 0, py: 0, pxT: 0, pyT: 0, hold: 99, drag: false, homing: false };
+let tc = Math.cos(TILT0), ts = Math.sin(TILT0); // cos e sen da inclinação atual (calculados uma vez por quadro)
+// Com zoom, o próprio quadro do globo cresce (até ao tamanho da janela) em vez de cortar a imagem:
+// S = quanto o quadro cresceu, L = lado do canvas em pixéis, zdraw = zoom que sobra para desenhar lá dentro.
+let S = 1, L = W, zdraw = 1;
 const LAND = [];
 for (let la = -88; la <= 88; la += ST) {
   const step = ST / Math.max(.15, Math.cos(la * D));
@@ -65,7 +73,7 @@ for (let la = -88; la <= 88; la += ST) {
 function proj(lo, la, rot, h = 0) {
   const l = lo + rot, cl = Math.cos(la), s = 1 + h;
   const x = cl * Math.sin(l), y = Math.sin(la), z = cl * Math.cos(l);
-  return [x * s, (y * Math.cos(TILT) - z * Math.sin(TILT)) * s, (y * Math.sin(TILT) + z * Math.cos(TILT)) * s];
+  return [x * s, (y * tc - z * ts) * s, (y * ts + z * tc) * s];
 }
 
 // Cidades que podes escolher como "a tua": [id, nome, latitude, longitude].
@@ -173,12 +181,34 @@ function frame(t) {
   const dt = Math.min(.05, (t - last) / 1000 || .016); last = t;
   const sp = { idle: .5, listen: .9, think: 2.6, speak: 1.6 }[state];
   ph += dt * sp * (still ? .2 : 1);
-  spin += dt * sp * .28 * cfg.speed * (still ? .2 : 1);
+  // vista: com o dedo/rato em cima a rotação automática pára e volta devagar ~1,5 s depois de largar
+  if (view.drag) view.hold = 0;
+  else { view.rot += view.vel * dt; view.vel *= Math.pow(.04, dt); view.hold += dt; }
+  const ease = k => Math.min(1, dt * k);
+  view.zoom += (view.zoomT - view.zoom) * ease(10); view.tilt += (view.tiltT - view.tilt) * ease(8);
+  view.px += (view.pxT - view.px) * ease(10); view.py += (view.pyT - view.py) * ease(10);
+  if (view.homing) { // duplo clique: volta a rodar para a posição inicial (onde está a tua cidade)
+    const diff = -spin - view.rot; view.rot += diff * ease(6);
+    if (Math.abs(diff) < .01) view.homing = false;
+  }
+  tc = Math.cos(view.tilt); ts = Math.sin(view.tilt);
+  const base = Math.min(420, innerWidth * .8, innerHeight * .48); // lado do quadro sem zoom (igual ao CSS)
+  const Smax = Math.max(1, Math.min(innerWidth, innerHeight * .95) / base);
+  S = Math.round(Math.min(Math.max(1, view.zoom), Smax) * 20) / 20;
+  if (cv.width !== Math.round(W * S)) { cv.width = cv.height = Math.round(W * S); cv.style.setProperty('--s', S); }
+  L = cv.width; zdraw = view.zoom / S;
+  // o globo não pode sair do quadro (senão ficaria cortado): limita o quanto se pode mover
+  const lim = Math.max(0, L / 2 - 300 * zdraw);
+  for (const k of ['px', 'py', 'pxT', 'pyT']) view[k] = Math.max(-lim, Math.min(lim, view[k]));
+  cv.classList.toggle('zm', S > 1);
+  spin += dt * sp * .28 * cfg.speed * (still ? .2 : 1) * (view.drag ? 0 : Math.min(1, view.hold / 1.5));
   const k = t / 1000;
   const tgt = state === 'listen' ? .08 + .08 * Math.sin(k * 7) : state === 'speak' ? .2 * (.4 + .6 * Math.abs(Math.sin(k * 9) * Math.sin(k * 4.1))) + kick : .04 * Math.sin(k * 1.6);
   pulse += (tgt - pulse) * .2; kick *= .92;
-  const P = pal(), rot = spin, Rg = R * (1 + pulse * .12), sa = ph * .9;
-  cx.clearRect(0, 0, W, W);
+  const P = pal(), rot = spin + view.rot, Rg = R * (1 + pulse * .12), sa = ph * .9;
+  cx.setTransform(1, 0, 0, 1, 0, 0); cx.clearRect(0, 0, L, L);
+  cx.setTransform(1, 0, 0, 1, (L - W) / 2, (L - W) / 2); // o desenho de 640×640 fica sempre ao centro do quadro
+  cx.save(); cx.translate(C + view.px, C + view.py); cx.scale(zdraw, zdraw); cx.translate(-C, -C);
 
   // atmosfera
   let g = cx.createRadialGradient(C, C, Rg * .8, C, C, Rg * 1.5);
@@ -285,6 +315,8 @@ function frame(t) {
     for (let i = 0; i < 4; i++) arc(R * 1.6, ph * .04 + Math.PI / 4 + i * Math.PI / 2 - .22, .44, 3, .6);
   }
 
+  cx.restore(); // fim da parte que faz zoom; os textos dos cantos ficam sempre no mesmo sítio
+
   // leituras nos cantos, estilo painel de comando
   if (!cfg.hud) { requestAnimationFrame(frame); return; }
   const hh = new Date().toISOString().slice(11, 19);
@@ -294,4 +326,49 @@ function frame(t) {
   cx.fillStyle = `rgba(${P.rgb},.7)`; cx.textBaseline = 'bottom'; cx.fillText(hh + ' UTC', W - 16, W - 14);
   requestAnimationFrame(frame);
 }
+
+// Rato e dedos: arrastar roda o globo (com inércia), a roda do rato ou a pinça fazem zoom,
+// Shift + arrastar (ou botão direito) move-o, e duplo clique repõe a vista.
+const ptrs = new Map();
+let lastX = 0, lastY = 0, lastT = 0, pinch = 0, panning = false;
+const cssW = () => cv.getBoundingClientRect().width;
+const dist = () => { const [a, b] = [...ptrs.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]) || 1; };
+function clampView() {
+  view.zoomT = Math.min(3, Math.max(.6, view.zoomT));
+}
+cv.title = 'Arrasta para rodar · roda do rato para zoom · Shift + arrastar para mover · duplo clique para repor';
+cv.addEventListener('pointerdown', e => {
+  cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  lastX = e.clientX; lastY = e.clientY; lastT = e.timeStamp; view.vel = 0; view.drag = true; view.homing = false;
+  panning = e.shiftKey || e.button === 1 || e.button === 2;
+  if (ptrs.size === 2) pinch = dist();
+});
+cv.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (ptrs.size === 2) { const d = dist(); if (pinch) { view.zoomT *= d / pinch; clampView(); } pinch = d; return; }
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  if (panning) {
+    const k = L / cssW();
+    view.pxT += dx * k; view.pyT += dy * k; clampView(); view.px = view.pxT; view.py = view.pyT;
+  } else {
+    const r = R * (cssW() / L) * zdraw, da = dx / r, dt = Math.max(.001, (e.timeStamp - lastT) / 1000);
+    view.rot += da;
+    view.tilt = view.tiltT = Math.max(-1.4, Math.min(1.4, view.tilt + dy / r));
+    view.vel = Math.max(-8, Math.min(8, .6 * view.vel + .4 * da / dt));
+  }
+  lastX = e.clientX; lastY = e.clientY; lastT = e.timeStamp;
+});
+const release = e => {
+  if (!ptrs.delete(e.pointerId)) return;
+  pinch = 0;
+  if (panning || e.timeStamp - lastT > 90) view.vel = 0; // parou antes de largar: sem inércia
+  if (!ptrs.size) view.drag = false;
+  else { const [p] = ptrs.values(); lastX = p[0]; lastY = p[1]; }
+};
+cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', release);
+cv.addEventListener('wheel', e => { e.preventDefault(); view.zoomT *= Math.exp(-e.deltaY * .0011); clampView(); }, { passive: false });
+cv.addEventListener('dblclick', () => { view.zoomT = 1; view.pxT = view.pyT = 0; view.tiltT = TILT0; view.vel = 0; view.homing = true; });
+cv.addEventListener('contextmenu', e => e.preventDefault());
+
 requestAnimationFrame(frame);

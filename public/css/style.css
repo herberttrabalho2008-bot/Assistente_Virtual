@@ -31,7 +31,11 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 
 /* centro: esfera, transcrição e microfone */
 .center{align-items:center;justify-content:center;padding:16px;text-align:center}
-#orb{width:min(420px,80vw,48vh);aspect-ratio:1;flex:none}
+#orb{--b:min(420px,80vw,48vh);--s:1;width:calc(var(--b)*var(--s));margin:calc(var(--b)*(1 - var(--s))/2);aspect-ratio:1;flex:none;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+#orb:active{cursor:grabbing}
+/* com zoom o quadro cresce por cima do resto, sem mexer no resto da página (a margem negativa compensa) */
+#orb.zm{position:relative;z-index:1}
+.panel{position:relative;z-index:2} /* os painéis ficam por cima do globo ampliado, para os botões continuarem a funcionar */
 #said{margin:18px 0 0;color:var(--g);font-size:15px;min-height:1.3em;max-width:520px}
 #hd{margin:8px 0;font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:.01em}
 #reply{margin:0;color:var(--mute);font-size:15px;line-height:1.5;max-width:520px;min-height:1.5em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}

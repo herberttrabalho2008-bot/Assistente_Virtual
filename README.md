@@ -101,6 +101,17 @@ Em **Definições**, na secção **Globo**, tudo se aplica ao vivo:
 
 As escolhas ficam guardadas só no dispositivo (no PC e no telemóvel são independentes).
 
+### Mexer no globo com o rato ou os dedos
+
+No ecrã inicial, o globo é interativo:
+
+| Gesto | O que faz |
+| --- | --- |
+| Arrastar | Roda o globo (e inclina-o), com inércia ao largar. A rotação automática pára enquanto mexes e volta devagar. |
+| Roda do rato / pinça (telemóvel) | Zoom de 0,6× a 3×. |
+| Shift + arrastar (ou botão direito) | Move o globo no ecrã. |
+| Duplo clique | Repõe o zoom, a posição, a inclinação e a rotação (volta a mostrar a tua cidade). |
+
 ### Escolher um modelo rápido
 
 A velocidade depende sobretudo do modelo. Modelos gigantes (centenas de milhares de milhões de parâmetros) podem demorar dezenas de segundos só a começar, sobretudo em contas gratuitas. Para conversa normal, um modelo leve responde em poucos segundos. Se ficar fraco para perguntas difíceis, volta a um maior nas Definições. O contador de segundos mostra o tempo real de cada resposta.
