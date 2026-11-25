@@ -26,6 +26,14 @@ O globo e tudo o que mudou está descrito em [Novidades](#novidades) e em [Perso
 - **Duas cores por tema:** além da cor principal (verde, azul ou vermelho) há uma cor de contraste e uma atmosfera noutro tom (por exemplo âmbar sobre o azul).
 - O globo reage aos estados do assistente: roda mais depressa ao pensar e pulsa ao falar.
 
+### As três cores
+
+A cor escolhe-se em **Definições**. Cada tema tem a sua cor principal e uma cor de contraste (podes trocá-la na secção Globo).
+
+| Verde | Azul | Vermelho |
+| --- | --- | --- |
+| ![Camões em verde](imagens/cor-verde.png) | ![Camões em azul](imagens/cor-azul.png) | ![Camões em vermelho](imagens/cor-vermelho.png) |
+
 ### Respostas mais rápidas
 - **Streaming:** o texto aparece à medida que o modelo o escreve, tanto na Anthropic como nas APIs compatíveis com OpenAI.
 - **Voz por frases:** em modo de voz, o Camões começa a falar logo que a primeira frase está completa.
