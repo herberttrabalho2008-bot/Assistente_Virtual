@@ -4,8 +4,9 @@ const fs = require('fs');
 const path = require('path');
 
 const PROVIDERS = ['anthropic', 'openai'];
-const DEFAULT_MODEL = { anthropic: 'claude-sonnet-5-5', openai: '' };
-const DEFAULT_BASE = 'https://api.openai.com/v1';
+// Por omissão: a API da NVIDIA (compatível com OpenAI) com um modelo leve e rápido.
+const DEFAULT_MODEL = { anthropic: 'claude-sonnet-5-5', openai: 'nvidia/nemotron-3.5-lightning-30b-a3b' };
+const DEFAULT_BASE = 'https://integrate.api.nvidia.com/v1';
 
 const isLocalUrl = u => { try { return ['localhost', '127.0.0.1', '[::1]'].includes(new URL(u).hostname); } catch { return false; } };
 
@@ -32,7 +33,8 @@ function createSettings(file, env = {}) {
   }
   const activeName = saved => {
     const p = saved.provider || env.CAMOES_PROVIDER;
-    return PROVIDERS.includes(p) ? p : 'anthropic';
+    if (PROVIDERS.includes(p)) return p;
+    return env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY ? 'anthropic' : 'openai';
   };
 
   function get() {

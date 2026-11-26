@@ -19,10 +19,10 @@ Estado a 2026-11-25. Ordenadas por prioridade dentro de cada secção.
 ## Funcionalidades
 
 - [ ] Avisos de lembretes com a app fechada (Web Push: chaves VAPID, subscrição guardada no servidor).
-- [ ] Guardar o histórico da conversa (hoje só existe em memória e perde-se ao recarregar a página).
+- [x] Guardar o histórico da conversa (feito no `localStorage`, últimas 40 mensagens). Falta, se for preciso, sincronizá-lo entre dispositivos no servidor.
 - [x] Respostas em *streaming* (feito: o texto aparece à medida que é escrito, e a voz fala por frases).
 - [ ] Verificar a voz por frases num browser com microfone e voz pt-PT (escrita mas não ouvida).
-- [x] Imagens do README (`imagens/ecra-pc.png` e `ecra-telemovel.png`) atualizadas com o globo.
+- [ ] Voltar a tirar as imagens do README (`ecra-pc`, `ecra-telemovel` e `cor-*`): mostram o globo antigo, anterior ao planeta em WebGL.
 - [ ] Lembretes: editar, repetir (diário, semanal) e adiar.
 - [ ] Controlar o PC: módulo local com uma lista curta de ações permitidas e confirmação antes de executar. Só depois de rever a segurança.
 - [ ] Mostrar na página de Definições a lista de modelos disponíveis, em vez de só sugestões.

@@ -3,6 +3,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { version } = require('../package.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -66,7 +67,7 @@ function createServer({ config, store, assistant, settings }) {
     if (!sameSite(req)) return send(res, 403, { error: 'origem' });
     if (!authed(req)) return send(res, 401, { error: 'token' });
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
-    if (parts[1] === 'ping') return send(res, 200, { ok: true, chat: assistant.isConfigured() });
+    if (parts[1] === 'ping') return send(res, 200, { ok: true, chat: assistant.isConfigured(), version });
 
     if (parts[1] === 'settings') {
       if (parts[2] === 'test' && req.method === 'POST') {
@@ -132,7 +133,7 @@ function createServer({ config, store, assistant, settings }) {
     if (!file.startsWith(config.publicDir + path.sep)) { res.writeHead(403); return res.end(); }
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404); return res.end('Não encontrado'); }
-      res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream', 'cache-control': file.endsWith('sw.js') ? 'no-cache' : 'public, max-age=300' });
+      res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' }); // o browser confirma sempre com o servidor: uma atualização aparece logo, sem Ctrl+F5
       res.end(buf);
     });
   }

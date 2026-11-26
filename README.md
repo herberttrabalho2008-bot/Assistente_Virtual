@@ -2,13 +2,15 @@
 
 # Camões
 
+**Versão 0.4.0**
+
 Assistente virtual pessoal em português de Portugal, inspirado no JARVIS. Corre no teu PC e usas no PC e no telemóvel (como app instalável).
 
 - Conversa por texto e por voz, com um globo terrestre futurista e personalizável.
 - As respostas aparecem à medida que são escritas (streaming), com um contador de segundos.
 - Quatro modos: Geral, Estudo, Programação e Criativo.
 - Lembretes guardados no servidor, iguais em todos os dispositivos.
-- Funciona com Claude (Anthropic), OpenAI, a API da NVIDIA ou modelos locais (Ollama, LM Studio).
+- Vem pronto para a **API da NVIDIA** (gratuita) com o modelo `nvidia/nemotron-3.5-lightning-30b-a3b`, e também funciona com Claude (Anthropic), OpenAI ou modelos locais (Ollama, LM Studio).
 - Sem dependências: só precisas do Node.js.
 
 | PC | Telemóvel |
@@ -19,12 +21,15 @@ O globo e tudo o que mudou está descrito em [Novidades](#novidades) e em [Perso
 
 ## Novidades
 
+Versão 0.4.0: tudo o que está abaixo. O número da versão está no `package.json` e aparece no fundo das Definições.
+
 ### Globo futurista
-- A esfera deu lugar a um **globo terrestre** que roda, com a Terra inclinada, grelha de latitudes e longitudes e continentes feitos de pontos.
-- **Ligações de dados:** arcos luminosos partem da tua cidade (Lisboa por omissão) para outras seis, com pacotes de dados a viajar.
-- **Efeitos de painel de comando:** radar a varrer, linhas de scan holográficas, anel de marcas, dois cometas, um satélite em órbita, cantos de mira e leituras de texto nos cantos (estado do assistente e hora UTC).
+- A esfera deu lugar a um **globo holográfico em WebGL**, refeito de raiz: uma esfera de vidro escuro com os continentes reais (Natural Earth) lisos e com a costa a brilhar, grelha ténue, linha de varrimento e uma atmosfera a brilhar na orla.
+- **Ligações de dados:** arcos finos que partem da tua cidade (Lisboa por omissão) para outras seis, a esbater-se para o destino, com um pulso de luz a viajar e um pequeno anel em cada cidade.
+- **Anéis à volta:** uma linha fina, três arcos que desvanecem nas pontas, uma escala de marcas, dois cometas e um satélite em órbita (que passa por trás do planeta).
 - **Duas cores por tema:** além da cor principal (verde, azul ou vermelho) há uma cor de contraste e uma atmosfera noutro tom (por exemplo âmbar sobre o azul).
 - O globo reage aos estados do assistente: roda mais depressa ao pensar e pulsa ao falar.
+
 
 ### As três cores
 
@@ -40,10 +45,16 @@ A cor escolhe-se em **Definições**. Cada tema tem a sua cor principal e uma co
 - **Menos pedidos falhados:** se um modelo recusar ferramentas, o servidor lembra-se e deixa de as enviar, em vez de repetir o pedido em cada mensagem.
 - **Contador de segundos** em cada resposta, no ecrã principal e no chat.
 - **Mensagem clara** quando o modelo devolve uma resposta vazia, em vez de mostrar só "…".
-- O modelo por omissão para contas gratuitas da NVIDIA é o `nvidia/nemotron-3.5-lightning-30b-a3b`, muito mais rápido do que modelos gigantes como o `mistral-large-4-1t`.
+- O modelo por omissão é o `nvidia/nemotron-3.5-lightning-30b-a3b`, muito mais rápido do que modelos gigantes como o `mistral-large-4-1t`.
 
 ### Conversa
+- **Respostas com formatação:** código (em blocos e em linha), listas, títulos, negrito e itálico aparecem bem formatados. É seguro: o texto do modelo nunca é tratado como HTML.
+- **Indicador "a escrever"** (três pontos) enquanto o Camões não responde.
 - **Botão de limpar a conversa** (ícone de lixo): toca duas vezes para apagar o histórico, os balões e o texto do ecrã principal.
+
+### Interface
+- No PC, os lembretes e a conversa estão em **painéis de vidro** sobre um fundo com um halo suave, e o cabeçalho é translúcido.
+- Microfone com anel a pulsar quando está a ouvir, cartões de lembretes com realce ao passar o rato e balões de conversa com entrada suave.
 
 ### Definições redesenhadas
 - Cartões por secção (Modo e cor, Globo, API), com ícones, interruptores, slider, seletor de cor redondo e botões novos.
@@ -77,9 +88,9 @@ Deve aparecer `Camões a correr em http://localhost:3000`. Deixa essa janela abe
 
 1. Abre http://localhost:3000 no browser.
 2. Clica na roda dentada (**Definições**), no canto de cima à direita.
-3. Escolhe o fornecedor e preenche:
+3. O Camões já vem configurado para a **NVIDIA** (fornecedor "Compatível com OpenAI", endereço `https://integrate.api.nvidia.com/v1` e modelo `nvidia/nemotron-3.5-lightning-30b-a3b`). Só tens de colar a tua chave, que começa por `nvapi-` e se cria de graça em [build.nvidia.com](https://build.nvidia.com). Para usar outra coisa, escolhe o fornecedor e preenche:
    - **Anthropic (Claude):** cola a tua chave da API. O modelo já vem preenchido.
-   - **Compatível com OpenAI:** endereço, modelo e chave. Para um modelo local com Ollama usa `http://localhost:11434/v1`, o nome do modelo (por exemplo `llama3`) e deixa a chave vazia.
+   - **Compatível com OpenAI:** endereço, modelo e chave (OpenAI, NVIDIA com outro modelo, etc.). Para um modelo local com Ollama usa `http://localhost:11434/v1`, o nome do modelo (por exemplo `llama3`) e deixa a chave vazia.
 4. Clica em **Guardar** e depois em **Testar**. Se aparecer uma resposta, está pronto.
 
 A chave fica só no teu computador (`data/settings.json`, fora do Git) e nunca volta a aparecer no browser.
@@ -104,7 +115,7 @@ Em **Definições**, na secção **Globo**, tudo se aplica ao vivo:
 | A tua cidade | Escolhe entre 16 cidades (Lisboa, Porto, Funchal, Praia, Luanda, Maputo, São Paulo, Rio, Londres, Paris, Madrid, Nova Iorque, Dubai, Joanesburgo, Tóquio, Sydney). Fica marcada no globo e as ligações partem dela. |
 | Velocidade de rotação | De 0× (parado) a 3×. |
 | Cor de contraste | Seletor de cor livre para as ligações, o marcador, um cometa e o satélite. "Automática" volta à cor do tema. |
-| Interruptores | Ligações de dados, marcar a minha cidade, radar e linhas de scan, anéis/cometas/satélite e textos nos cantos. |
+| Interruptores | Ligações de dados, marcar a minha cidade, grelha e linha de varrimento e anéis/cometas/satélite. |
 | Repor o globo | Volta a todas as predefinições. |
 
 As escolhas ficam guardadas só no dispositivo (no PC e no telemóvel são independentes).
@@ -152,12 +163,12 @@ Tudo se pode fazer em **Definições**. Se preferires ficheiro, copia `.env.exam
 | Variável | Para quê |
 | --- | --- |
 | `ANTHROPIC_API_KEY` | Chave da Anthropic |
-| `OPENAI_API_KEY` | Chave da OpenAI |
+| `OPENAI_API_KEY` | Chave do fornecedor compatível com OpenAI (por omissão a NVIDIA, `nvapi-…`) |
 | `CAMOES_TOKEN` | Código de acesso (obrigatório fora do PC) |
 | `PORT` | Porta do servidor (por omissão 3000) |
-| `CAMOES_PROVIDER` | `anthropic` ou `openai` |
-| `CAMOES_MODEL`, `CAMOES_OPENAI_MODEL` | Modelo de cada fornecedor |
-| `CAMOES_OPENAI_BASE_URL` | Endereço da API compatível com OpenAI |
+| `CAMOES_PROVIDER` | `anthropic` ou `openai` (por omissão `openai`, a NVIDIA; só com `ANTHROPIC_API_KEY` definida passa a `anthropic`) |
+| `CAMOES_MODEL`, `CAMOES_OPENAI_MODEL` | Modelo de cada fornecedor (por omissão `claude-sonnet-5-5` e `nvidia/nemotron-3.5-lightning-30b-a3b`) |
+| `CAMOES_OPENAI_BASE_URL` | Endereço da API compatível com OpenAI (por omissão `https://integrate.api.nvidia.com/v1`) |
 
 ## Problemas comuns
 
@@ -173,8 +184,8 @@ Tudo se pode fazer em **Definições**. Se preferires ficheiro, copia `.env.exam
 - Os avisos de lembretes só aparecem com a app aberta. Com a app fechada seria preciso Web Push, que ainda não está feito.
 - A voz usa o reconhecimento do browser. No Chrome, o áudio vai para a Google.
 - O Camões não controla o PC.
-- O histórico da conversa perde-se quando recarregas a página (ou quando a limpas).
-- Os continentes do globo são contornos aproximados, feitos à mão.
+- O histórico da conversa (últimas 40 mensagens) fica guardado no browser, só nesse dispositivo: no PC e no telemóvel são independentes, e apagam-se ao limpar a conversa ou os dados do site.
+- O globo precisa de WebGL (todos os browsers atuais o têm). Sem ele, aparece um disco simples e perdem-se os continentes.
 - Em modelos que não aceitam ferramentas (alguns da NVIDIA e locais), a conversa funciona mas o Camões não cria lembretes por ti.
 - O servidor limita a 20 mensagens por minuto por IP, mas isso não substitui um limite de gastos na conta da API.
 
@@ -185,6 +196,7 @@ A lista do que falta fazer está em [TODO.md](TODO.md).
 ```bash
 npm test         # testes do servidor (node --test)
 npm run icons    # volta a gerar a logo e os ícones
+node tools/make-land.js ne_110m_land.geojson   # volta a gerar public/data/land.json
 ```
 
 ```
@@ -199,11 +211,16 @@ src/
 public/              a app (sem build: módulos ES nativos)
   index.html, sw.js, manifest.webmanifest, ícones
   css/style.css
-  js/                main, chat, voice, reminders, orb (o globo), globeui (opções do globo),
+  js/                main, chat, md (markdown simples), voice, reminders, orb (o globo em WebGL), globeui (opções do globo),
                      theme, settings, ui, api, util
 test/                testes do servidor (http, settings, store e streaming)
 tools/make-icons.js  desenha a logo e gera os ícones
+tools/make-land.js   converte o GeoJSON do Natural Earth em public/data/land.json
 imagens/             logo (logo.png, gerada por npm run icons) e imagens do ecrã
 legacy/              protótipos originais (só funcionavam dentro do claude.ai)
 data/                lembretes e definições (criada ao correr; fora do Git)
 ```
+
+## Créditos
+
+Os continentes do globo vêm do [Natural Earth](https://www.naturalearthdata.com) (dados de terra 1:110m, domínio público), guardados em `public/data/land.json`.

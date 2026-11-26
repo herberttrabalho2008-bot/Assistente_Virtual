@@ -53,7 +53,9 @@ test('estáticos: serve a app e bloqueia saídas de public/', async () => {
   const s = await start();
   try {
     assert.strictEqual((await fetch(s.base + '/')).status, 200);
-    assert.strictEqual((await fetch(s.base + '/js/main.js')).status, 200);
+    const js = await fetch(s.base + '/js/main.js');
+    assert.strictEqual(js.status, 200);
+    assert.strictEqual(js.headers.get('cache-control'), 'no-cache'); // senão o browser mostra versões velhas
     // fetch normaliza "..", por isso usa-se um pedido TCP cru
     const net = require('net');
     const status = await new Promise(res => {

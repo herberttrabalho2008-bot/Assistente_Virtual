@@ -3,7 +3,7 @@ import { $ } from './util.js';
 import { getGlobe, setGlobe, CITY_LIST, GLOBE_DEFAULTS } from './orb.js';
 import { palette } from './theme.js';
 
-const TOGGLES = ['links', 'home', 'radar', 'rings', 'hud'];
+const TOGGLES = ['links', 'home', 'radar', 'rings'];
 const hex = rgb => '#' + rgb.split(',').map(n => (+n).toString(16).padStart(2, '0')).join('');
 
 // Põe os controlos de acordo com a configuração atual (o seletor de cor mostra a cor em uso).

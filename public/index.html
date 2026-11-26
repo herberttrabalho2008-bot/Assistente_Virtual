@@ -13,6 +13,7 @@
 </head>
 <body>
 <div id="toast" role="alert"></div>
+<canvas id="gl" aria-hidden="true"></canvas><canvas id="fx" aria-hidden="true"></canvas>
 <header class="top">
 <div class="brand"><span>C</span>amões</div>
 <span class="status" id="sy"></span>
@@ -26,7 +27,7 @@
 <div class="cards" id="list"></div>
 </section>
 <section class="center">
-<canvas id="orb" width="640" height="640" aria-hidden="true"></canvas>
+<div id="orb" aria-hidden="true"></div>
 <p id="said"></p>
 <h1 id="hd">Como posso ajudar-te hoje?</h1>
 <p id="reply" aria-live="polite"></p>
@@ -76,9 +77,8 @@
 <div class="tgls">
 <label class="tog"><input type="checkbox" id="g-links"> Ligações de dados</label>
 <label class="tog"><input type="checkbox" id="g-home"> Marcar a minha cidade</label>
-<label class="tog"><input type="checkbox" id="g-radar"> Radar e linhas de scan</label>
+<label class="tog"><input type="checkbox" id="g-radar"> Grelha e linha de varrimento</label>
 <label class="tog"><input type="checkbox" id="g-rings"> Anéis, cometas e satélite</label>
-<label class="tog"><input type="checkbox" id="g-hud"> Textos nos cantos</label>
 </div>
 <button type="button" id="gres" class="mini">Repor o globo</button>
 <p class="note">Dica: no ecrã inicial, arrasta o globo para o rodar, usa a roda do rato (ou a pinça no telemóvel) para o zoom, Shift + arrastar para o mover e duplo clique para o repor.</p>
@@ -98,6 +98,7 @@
 <div class="srow"><button class="alt" id="ssave">Guardar</button><button type="button" class="alt sec" id="stest">Testar</button><button type="button" class="alt sec" id="sclear" hidden>Apagar chave</button></div>
 <p class="note">A chave fica guardada só no servidor e nunca volta a ser mostrada.</p>
 </form>
+<p class="note" id="ver"></p>
 </div>
 </dialog>
 <script type="module" src="js/main.js"></script>

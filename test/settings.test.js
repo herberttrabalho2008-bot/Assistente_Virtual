@@ -12,10 +12,20 @@ const { createServer } = require('../src/http');
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'camoes-'));
 const NOW = { role: 'geral', now: 'agora', tzOffset: 0 };
 
-test('settings: por omissão Anthropic, sem chave = não configurado', () => {
+test('settings: por omissão NVIDIA + nemotron, sem chave = não configurado', () => {
   const s = createSettings(path.join(tmp(), 's.json'), {});
-  assert.strictEqual(s.get().provider, 'anthropic');
+  const c = s.get();
+  assert.strictEqual(c.provider, 'openai');
+  assert.strictEqual(c.model, 'nvidia/nemotron-3.5-lightning-30b-a3b');
+  assert.strictEqual(c.baseUrl, 'https://integrate.api.nvidia.com/v1');
   assert.strictEqual(s.isConfigured(), false);
+  s.update({ provider: 'openai', apiKey: 'nvapi-teste-1234' });
+  assert.strictEqual(s.isConfigured(), true);
+});
+
+test('settings: só com ANTHROPIC_API_KEY no ambiente, o padrão é o Claude', () => {
+  const s = createSettings(path.join(tmp(), 's.json'), { ANTHROPIC_API_KEY: 'sk-env-1234' });
+  assert.strictEqual(s.get().provider, 'anthropic');
 });
 
 test('settings: chave do ambiente conta; guardada nas definições tem prioridade', () => {
@@ -123,7 +133,9 @@ test('API: guardar definições, nunca devolve a chave, e /test usa o fornecedor
   const fake = async () => ok({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'ok' }] });
   const s = await serve({}, fake);
   try {
-    assert.strictEqual((await (await fetch(s.base + '/api/ping')).json()).chat, false);
+    const ping = await (await fetch(s.base + '/api/ping')).json();
+    assert.strictEqual(ping.chat, false);
+    assert.strictEqual(ping.version, require('../package.json').version);
     assert.strictEqual((await fetch(s.base + '/api/settings/test', J('POST'))).status, 503);
     const put = await fetch(s.base + '/api/settings', J('PUT', { provider: 'anthropic', apiKey: 'sk-ant-SECRETO-1234' }));
     const txt = await put.text();
@@ -150,12 +162,12 @@ test('API: chave recusada pelo fornecedor devolve código "chave"', async () => 
 test('segurança: bloqueia escritas de outros sites e pedidos sem JSON', async () => {
   const s = await serve({});
   try {
-    const body = JSON.stringify({ provider: 'openai', baseUrl: 'https://evil.example/v1' });
+    const body = JSON.stringify({ provider: 'anthropic', apiKey: 'chave-do-atacante' });
     const cross = await fetch(s.base + '/api/settings', { method: 'PUT', headers: { 'content-type': 'application/json', origin: 'https://evil.example' }, body });
     assert.strictEqual(cross.status, 403);
     const plain = await fetch(s.base + '/api/settings', { method: 'PUT', headers: { 'content-type': 'text/plain' }, body });
     assert.strictEqual(plain.status, 403);
-    assert.strictEqual((await (await fetch(s.base + '/api/settings')).json()).provider, 'anthropic');
+    assert.strictEqual((await (await fetch(s.base + '/api/settings')).json()).provider, 'openai'); // continua no padrão
   } finally { await s.close(); }
 });
 

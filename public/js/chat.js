@@ -5,15 +5,22 @@ import { setState } from './orb.js';
 import { speaker, listen, isOn } from './voice.js';
 import { loadRem } from './reminders.js';
 import { getRole } from './ui.js';
+import { md, plain } from './md.js';
 
-const hist = [];
+// O histórico fica no browser (só neste dispositivo) e volta quando se recarrega a página.
+const KEY = 'camoes_conversa', MAX = 40;
+const hist = (() => {
+  try { const h = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(h) ? h.filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string').slice(-MAX) : []; }
+  catch (e) { return []; }
+})();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(hist.slice(-MAX))); } catch (e) {} };
 let busy = false;
 export const isBusy = () => busy;
 
 // Apaga a conversa (histórico, balões e o texto do ecrã principal). Não faz nada a meio de uma resposta.
 export function clearChat() {
   if (busy) return false;
-  hist.length = 0;
+  hist.length = 0; save();
   $('#log').replaceChildren();
   $('#said').textContent = $('#reply').textContent = $('#tmr').textContent = '';
   try { speechSynthesis.cancel(); } catch (e) {}
@@ -21,7 +28,8 @@ export function clearChat() {
 }
 
 function bubble(cls, text) {
-  const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text;
+  const d = document.createElement('div'); d.className = 'msg ' + cls;
+  if (cls === 'v') { const b = document.createElement('div'); b.className = 'md'; md(b, text); d.append(b); } else d.textContent = text; // as respostas têm markdown
   const l = $('#log'); l.append(d); l.scrollTop = l.scrollHeight; return d;
 }
 
@@ -40,8 +48,9 @@ export async function send(text) {
   busy = true;
   bubble('u', text); hist.push({ role: 'user', content: text });
   $('#said').textContent = text; $('#reply').textContent = '';
-  const out = bubble('v', ''), body = document.createElement('span'), tm = document.createElement('div');
-  tm.className = 'tm'; body.textContent = '…'; out.append(body, tm);
+  const out = bubble('v', ''), body = out.firstChild, tm = document.createElement('div');
+  const dots = document.createElement('span'); dots.className = 'dots'; dots.append(...[0, 1, 2].map(() => document.createElement('i'))); body.append(dots); // "a escrever" até chegar o texto
+  tm.className = 'tm'; out.append(tm);
   // contador de segundos: corre enquanto o Camões responde e fica com o tempo total no fim
   const t0 = performance.now();
   const tick = () => { $('#tmr').textContent = tm.textContent = '⏱ ' + ((performance.now() - t0) / 1000).toFixed(1) + ' s'; };
@@ -56,18 +65,23 @@ export async function send(text) {
       messages: hist.slice(-16), role: getRole(), tzOffset: now.getTimezoneOffset(),
       now: now.toLocaleString('pt-PT', { dateStyle: 'full', timeStyle: 'short' }) + ' (hora local, ISO ' + toLocal(now) + ')',
     }, t => {
-      reply += t; body.textContent = $('#reply').textContent = reply;
+      reply += t; md(body, reply); $('#reply').textContent = plain(reply);
       const l = $('#log'); l.scrollTop = l.scrollHeight;
       if (spk) spk.push(t);
     });
     if (!reply.trim()) throw Object.assign(new Error('vazio'), { status: 502, detail: 'resposta vazia, o modelo demorou demasiado ou falhou' });
-    reply = reply.trim(); body.textContent = $('#reply').textContent = reply; hist.push({ role: 'assistant', content: reply }); ok = true;
+    reply = reply.trim(); md(body, reply); $('#reply').textContent = plain(reply); hist.push({ role: 'assistant', content: reply }); ok = true;
     loadRem(); // o Camões pode ter criado ou apagado lembretes
   } catch (e) {
     if (spk) spk.abort();
-    hist.pop(); body.textContent = $('#reply').textContent = errText(e);
+    hist.pop(); body.replaceChildren(errText(e)); $('#reply').textContent = errText(e);
   }
-  clearInterval(timer); tick(); busy = false;
+  clearInterval(timer); tick(); save(); busy = false;
   if (ok && spk) spk.end();
   else if (isOn()) listen(); else setState('idle');
 }
+
+// Mostra a conversa guardada: os balões e a última pergunta e resposta no ecrã inicial.
+for (const m of hist) bubble(m.role === 'user' ? 'u' : 'v', m.content);
+const last = r => (hist.findLast(m => m.role === r) || {}).content || '';
+$('#said').textContent = last('user'); $('#reply').textContent = plain(last('assistant'));

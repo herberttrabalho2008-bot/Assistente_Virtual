@@ -66,5 +66,5 @@ if ('serviceWorker' in navigator && isSecureContext) {
 }
 initSettings();
 initGlobeUI();
-api('GET', '/api/ping').then(p => { if (!p.chat) toast('Ainda não há API configurada: abre Definições (roda dentada).'); }).catch(() => {});
+api('GET', '/api/ping').then(p => { $('#ver').textContent = 'Camões v' + p.version; if (!p.chat) toast('Ainda não há API configurada: abre Definições (roda dentada).'); }).catch(() => {});
 startReminders();
